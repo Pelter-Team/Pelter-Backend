@@ -2,6 +2,7 @@ package main
 
 import (
 	"Pelter_backend/internal/config"
+	"Pelter_backend/internal/pkg/gorm"
 	"Pelter_backend/internal/server"
 	"context"
 	"fmt"
@@ -22,6 +23,10 @@ func main() {
 	app := fiber.New(fiber.Config{
 		AppName: cfg.App.Name,
 	})
+	gormDb, err := gorm.DbConn(&cfg.Database)
+	if err != nil {
+		panic("can't connect to db")
+	}
 
 	app.Use(cors.New())
 
@@ -33,7 +38,7 @@ func main() {
 		}
 	}()
 
-	server.Start(ctx, &cfg.App, app)
+	server.Start(ctx, &cfg.App, app) // add gormDb
 
 	<-ctx.Done()
 	slog.Info("Received shutdown signal, shutting down server...")
