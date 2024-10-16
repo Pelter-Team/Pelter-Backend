@@ -3,26 +3,33 @@ package gorm
 import (
 	"Pelter_backend/internal/config"
 	"errors"
+	"fmt"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"Pelter_backend/internal/entity"
 )
 
-type Product struct {
-	gorm.Model
-	Code  string `gorm:"primaryKey"`
-	Price uint
-}
-
 func DbConn(cfg *config.Db) (*gorm.DB, error) {
-	// NOTE: check the docs how to pass in db url cause i forgot
-	db, err := gorm.Open(postgres.Open("test.db"), &gorm.Config{})
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
+		cfg.Host,
+		cfg.User,
+		cfg.Password,
+		cfg.DBName,
+		cfg.Port,
+		cfg.SSLMode,
+		cfg.TimeZone,
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, errors.New("failed to connect database")
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&Product{})
+	db.AutoMigrate(&entity.Product{}, &entity.User{}, &entity.Review{}, &entity.Transaction{})
 
 	// Create
 	// db.Create(&Product{Code: "D42", Price: 100})
