@@ -6,13 +6,6 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: go_clean_app
-    environment:
-      - DB_HOST=db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=yourdb
-      - DB_PORT=5432
-      - PORT=8080
     ports:
       - "8080:8080" # Maps container's port 8080 to host's port 8080
     depends_on:
@@ -28,7 +21,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: yourdb
+      POSTGRES_DB: pelter
     ports:
       - "5432:5432" # Exposes PostgreSQL on port 5432
     volumes:
