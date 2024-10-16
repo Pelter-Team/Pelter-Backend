@@ -37,7 +37,7 @@ func main() {
 		}
 	}()
 
-	server.Start(ctx, &cfg.App, app) // add gormDb
+	server.Start(ctx, &cfg.App, app, gormDb) // add gormDb
 
 	<-ctx.Done()
 	slog.Info("Received shutdown signal, shutting down server...")

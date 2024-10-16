@@ -2,11 +2,11 @@ package product
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
-func Route(app *fiber.App) {
-	// TODO: send gorm db here
-	repo := NewProductRepository(nil)
+func Route(app *fiber.App, gorm *gorm.DB) {
+	repo := NewProductRepository(gorm)
 	usecase := NewProductUsecase(repo)
 	service := NewProductService(usecase)
 

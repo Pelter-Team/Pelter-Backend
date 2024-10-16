@@ -24,3 +24,7 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 func (r *repository) InsertProduct(pctx context.Context) error {
 	return nil
 }
+
+func (r *repository) DeleteProduct(pctx context.Context) error {
+	return nil
+}
