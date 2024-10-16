@@ -2,6 +2,7 @@ package main
 
 import (
 	"Pelter_backend/internal/config"
+	"Pelter_backend/internal/pkg/fiber"
 	"Pelter_backend/internal/pkg/gorm"
 	"Pelter_backend/internal/server"
 	"context"
@@ -11,7 +12,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
@@ -20,9 +20,8 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	app := fiber.New(fiber.Config{
-		AppName: cfg.App.Name,
-	})
+	app := fiber.FiberConn(&cfg.App)
+
 	gormDb, err := gorm.DbConn(&cfg.Database)
 	if err != nil {
 		panic("can't connect to db")
