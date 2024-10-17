@@ -5,13 +5,14 @@ services:
       dockerfile: Dockerfile
     container_name: go_clean_app
     ports:
-      - "8080:8080" # Maps container's port 8080 to host's port 8080
+      - "8080:8080"
     depends_on:
-      - db # Ensures the database service is started before the Go app
+      db:
+        condition: service_healthy
     networks:
       - app-network
     volumes:
-      - .:/app # Bind mount the project directory to the container for live reloading
+      - .:/app
 
   db:
     image: postgres:13
@@ -21,11 +22,16 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: pelter
     ports:
-      - "5432:5432" # Exposes PostgreSQL on port 5432
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Persist data in a Docker volume
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
