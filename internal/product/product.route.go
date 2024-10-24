@@ -10,6 +10,6 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	usecase := NewProductUsecase(repo)
 	service := NewProductService(usecase)
 
-	group := app.Group("/product_v1")
-	group.Post("/insert-product", service.InsertProduct)
+	group := app.Group("/products")
+	group.Get("/", service.InsertProduct)
 }
