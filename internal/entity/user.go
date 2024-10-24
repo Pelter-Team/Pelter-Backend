@@ -21,7 +21,7 @@ type User struct {
 	PhoneNumber    string
 	ProfileURL     string
 	lineID         string
-	Role           roleType `gorm:"type:enum('admin', 'customer', 'seller', 'foundation')"`
+	Role           roleType `gorm:"role_type"`
 	Address        string
 	Verified       bool
 	FoundationName *string
