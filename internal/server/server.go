@@ -3,6 +3,7 @@ package server
 import (
 	"Pelter_backend/internal/config"
 	"Pelter_backend/internal/product"
+	"Pelter_backend/internal/user"
 	"context"
 
 	"github.com/gofiber/fiber/v2"
@@ -24,5 +25,5 @@ func Start(pctx context.Context, cfg *config.App, app *fiber.App, gorm *gorm.DB)
 	_ = s.cfg
 
 	product.Route(s.app, gorm)
-
+	user.Route(s.app, gorm)
 }
