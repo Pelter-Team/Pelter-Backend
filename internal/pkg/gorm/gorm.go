@@ -27,10 +27,10 @@ func DbConn(cfg *config.Db) (*gorm.DB, error) {
 	if err != nil {
 		return nil, errors.New("failed to connect database")
 	}
+	db.Exec("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'role_type') THEN CREATE TYPE role_type AS ENUM ('admin', 'customer', 'seller', 'foundation'); END IF; END $$;")
 
 	// Migrate the schema
 	db.AutoMigrate(&entity.Product{}, &entity.User{}, &entity.Review{}, &entity.Transaction{})
-
 	// Create
 	// db.Create(&Product{Code: "D42", Price: 100})
 
