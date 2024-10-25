@@ -1,5 +1,5 @@
-# Use Golang official image as the base image
-FROM golang:1.23-alpine
+# Stage 1: Build the Go app
+FROM golang:1.23-alpine AS builder
 
 # Set the current working directory inside the container
 WORKDIR /app
@@ -14,10 +14,19 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o main ./cmd/main.go
+RUN mkdir -p /app/bin && go build -o /app/bin/app ./cmd/main.go
+
+# Stage 2: Run the Go app
+FROM alpine:latest
+
+# Set the current working directory inside the container
+WORKDIR /app
+
+# Copy the binary from the builder stage
+COPY --from=builder /app/bin/app /bin/app
 
 # Expose the port the app runs on
 EXPOSE 8080
 
 # Command to run the Go app
-CMD ["./main"]
+CMD ["/bin/app"]
