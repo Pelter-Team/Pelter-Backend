@@ -1,26 +1,38 @@
 package user
 
 import (
+	"Pelter_backend/internal/entity"
 	"context"
+	"errors"
+
+	"Pelter_backend/internal/pkg/bcrypt"
 )
 
 type (
-	usecase struct {
+	userUsecase struct {
 		userRepo UserRepository
 	}
 
 	UserUsecase interface {
-		InsertUser(pctx context.Context) error
+		Register(pctx context.Context, user *entity.User) error
 	}
 )
 
 func NewUserUsecase(userRepo UserRepository) UserUsecase {
-	return &usecase{
+	return &userUsecase{
 		userRepo: userRepo,
 	}
 }
 
-func (r *usecase) InsertUser(pctx context.Context) error {
-	_ = r.userRepo.RegisterUser(pctx)
-	return nil
+func (u *userUsecase) Register(ctx context.Context, user *entity.User) error {
+
+	existingUser, err := u.userRepo.FindByEmail(ctx, user.Email)
+	if err == nil && existingUser != nil {
+		return errors.New("email already registered")
+	}
+
+	hashedPwd, _ := bcrypt.HashPassword(user.Password)
+	user.Password = string(hashedPwd)
+
+	return u.userRepo.Create(ctx, user)
 }

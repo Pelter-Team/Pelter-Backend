@@ -18,11 +18,11 @@ type User struct {
 	Surname     string
 	Email       string
 	Password    string
-	PhoneNumber string
+	PhoneNumber *string
 	ProfileURL  string
 	// lineID         string
 	Role           roleType `gorm:"role_type"`
-	Address        string
+	Address        *string
 	Verified       bool
 	FoundationName *string
 	CreatedAt      time.Time

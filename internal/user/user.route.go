@@ -11,5 +11,5 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	service := NewUserService(usecase)
 
 	group := app.Group("/users")
-	group.Get("/", service.InsertUser)
+	group.Get("/register", service.Register)
 }
