@@ -1,7 +1,5 @@
 package entity
 
-import "time"
-
 // Custom Enum Type
 type roleType string
 
@@ -13,20 +11,17 @@ const (
 )
 
 type User struct {
-	ID          uint `gorm:"primary_key"`
-	Name        string
-	Surname     string
-	Email       string
-	Password    string
-	PhoneNumber *string
-	ProfileURL  string
-	// lineID         string
-	Role           roleType `gorm:"role_type"`
-	Address        *string
-	Verified       bool
-	FoundationName *string
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	ID             uint `gorm:"primary_key"`
+	Name           string
+	Surname        string
+	Email          string `gorm:"unique"`
+	Password       string
+	PhoneNumber    *string  `gorm:"default:null"`
+	ProfileURL     *string  `gorm:"default:null"`
+	Role           roleType `gorm:"type:role_type;default:'customer'"`
+	Address        *string  `gorm:"default:null"`
+	Verified       bool     `gorm:"default:false"`
+	FoundationName *string  `gorm:"default:null"`
 	ProductID      []Product
 	Transactions   []Transaction `gorm:"foreignKey:BuyerID"`
 	Sales          []Transaction `gorm:"foreignKey:SellerID"`
