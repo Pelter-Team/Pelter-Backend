@@ -15,7 +15,7 @@ type (
 	}
 	UserService interface {
 		Register(ctx *fiber.Ctx) error
-		// Login(ctx *fiber.Ctx) error
+		Login(ctx *fiber.Ctx) error
 	}
 )
 
@@ -62,6 +62,27 @@ func (s *userService) Register(ctx *fiber.Ctx) error {
 	})
 }
 
-// func (r *userService) Login(ctx *fiber.Ctx) error {
+func (s *userService) Login(ctx *fiber.Ctx) error {
+	var req dto.LoginRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error: "Invalid login format",
+		})
+	}
 
-// }
+	user, err := s.userUsecase.Login(context.Background(), req.Email, req.Password)
+	if err != nil {
+		if err.Error() == "invalid credentials" {
+			return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
+				Error: "Invalid email or password",
+			})
+		}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error: "Failed to login",
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result: user,
+	})
+}

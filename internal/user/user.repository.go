@@ -26,12 +26,12 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 }
 
 func (r *userRepository) Create(pctx context.Context, user *entity.User) error {
-	return r.Db.Create(user).Error
+	return r.Db.WithContext(pctx).Create(user).Error
 }
 
 func (r *userRepository) FindByEmail(pctx context.Context, email string) (*entity.User, error) {
 	var user entity.User
-	if err := r.Db.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := r.Db.WithContext(pctx).Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
