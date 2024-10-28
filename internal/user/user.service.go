@@ -47,7 +47,7 @@ func (s *userService) Register(ctx *fiber.Ctx) error {
 	}
 
 	if err := s.userUsecase.Register(context.Background(), &user); err != nil {
-		if err.Error() == "email already registered" {
+		if err.Error() == "email already registered" { // check error from use case
 			return ctx.Status(fiber.StatusConflict).JSON(dto.HttpResponse{
 				Error: "Email already registered",
 			})
@@ -70,7 +70,7 @@ func (s *userService) Login(ctx *fiber.Ctx) error {
 		})
 	}
 
-	user, err := s.userUsecase.Login(context.Background(), req.Email, req.Password)
+	user, token, err := s.userUsecase.Login(context.Background(), req.Email, req.Password)
 	if err != nil {
 		if err.Error() == "invalid credentials" {
 			return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
@@ -82,7 +82,8 @@ func (s *userService) Login(ctx *fiber.Ctx) error {
 		})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
-		Result: user,
+	return ctx.Status(fiber.StatusOK).JSON(dto.AuthResponse{
+		UserID:      user.ID,
+		AccessToken: token,
 	})
 }

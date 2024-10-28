@@ -4,8 +4,10 @@ import (
 	"Pelter_backend/internal/entity"
 	"context"
 	"errors"
+	"os"
 
 	"Pelter_backend/internal/pkg/bcrypt"
+	"Pelter_backend/internal/pkg/jwt"
 )
 
 type (
@@ -15,7 +17,7 @@ type (
 
 	UserUsecase interface {
 		Register(pctx context.Context, user *entity.User) error
-		Login(pctx context.Context, email, password string) (*entity.User, error)
+		Login(pctx context.Context, email, password string) (*entity.User, string, error)
 	}
 )
 
@@ -38,15 +40,19 @@ func (u *userUsecase) Register(ctx context.Context, user *entity.User) error {
 	return u.userRepo.Create(ctx, user)
 }
 
-func (u *userUsecase) Login(ctx context.Context, email, password string) (*entity.User, error) {
+func (u *userUsecase) Login(ctx context.Context, email, password string) (*entity.User, string, error) {
 	user, err := u.userRepo.FindByEmail(ctx, email)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	if !bcrypt.CheckPassword(user.Password, password) {
-		return nil, errors.New("invalid credentials")
+		return nil, "", errors.New("invalid credentials")
+	}
+	token, err := jwt.GenerateToken(user.ID, []byte(os.Getenv("JWT_SECRET")))
+	if err != nil {
+		return nil, "", err
 	}
 
-	return user, nil
+	return user, token, nil
 }
