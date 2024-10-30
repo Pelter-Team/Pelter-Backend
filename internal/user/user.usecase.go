@@ -38,7 +38,7 @@ func (u *userUsecase) Register(ctx context.Context, user *entity.User) error {
 	return u.userRepo.Create(ctx, user)
 }
 
-func (u *userUsecase) Login(ctx context.Context, email, password string) (*entity.User, string, error) {
+func (u *userUsecase) Login(ctx context.Context, email string, password string) (*entity.User, string, error) {
 	user, err := u.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, "", err

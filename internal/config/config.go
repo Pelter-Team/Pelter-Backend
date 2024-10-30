@@ -54,6 +54,7 @@ func LoadConfig() *Config {
 		App: App{
 			Port: os.Getenv("PORT"),
 			Name: os.Getenv("APP_NAME"),
+			Origin: os.Getenv("APP_ORIGIN"),
 		},
 		Database: Db{
 			Host:     os.Getenv("DB_HOST"),

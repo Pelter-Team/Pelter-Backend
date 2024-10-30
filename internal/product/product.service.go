@@ -25,6 +25,6 @@ func (s *productService) InsertProduct(ctx *fiber.Ctx) error {
 	_ = s.productUsecase.InsertProduct(ctx.Context())
 
 	return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
-		Error: "Bad Request",
+		Error: "Authenticated",
 	})
 }

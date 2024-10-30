@@ -1,15 +1,20 @@
 package jwt
 
 import (
+	"fmt"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func ValidateToken(tokenString string, secret []byte) (jwt.Claims, error) {
+func ValidateToken(tokenString string) (jwt.Claims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return secret, nil
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 	if err != nil {
 		return nil, err
@@ -20,18 +25,18 @@ func ValidateToken(tokenString string, secret []byte) (jwt.Claims, error) {
 func GenerateToken(id uint) (string, error) {
 	// create a new claims
 	claims := jwt.MapClaims{
-		"Subject":   id,
-		"ExpiredAt": jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
-		"IssuedAt":  jwt.NewNumericDate(time.Now()),
-		"NotBefore": jwt.NewNumericDate(time.Now()),
-		"Issuer":    "pelter",
+		"sub": id,
+		"exp": jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
+		"iat": jwt.NewNumericDate(time.Now()),
+		"nbf": jwt.NewNumericDate(time.Now()),
+		"iss": "pelter",
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(os.Getenv("JWT_SECRET"))
+	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
 
-func GetIDFromToken(tokenString string, secret []byte) (string, error) {
-	claims, err := ValidateToken(tokenString, secret)
+func GetIDFromToken(tokenString string) (string, error) {
+	claims, err := ValidateToken(tokenString)
 	if err != nil {
 		return "", err
 	}

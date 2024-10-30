@@ -29,10 +29,10 @@ func NewUserService(userUsecase UserUsecase) UserService {
 }
 
 func (s *userService) Register(ctx *fiber.Ctx) error {
-	var req *dto.RegisterRequest
+	var req dto.RegisterRequest
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
-			Error: "Invalid request format",
+			Error: "fuck " + err.Error(),
 		})
 	}
 
@@ -77,7 +77,7 @@ func (s *userService) Login(ctx *fiber.Ctx) error {
 			})
 		}
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
-			Error: "Failed to login",
+			Error: "Failed to login" + err.Error(),
 		})
 	}
 

@@ -27,7 +27,10 @@ func main() {
 		panic("can't connect to db")
 	}
 
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowCredentials: true,
+		AllowOrigins:     cfg.App.Origin,
+	}))
 
 	go func() { // start server
 		slog.Info(fmt.Sprintf("Starting server on port %s", cfg.App.Port))
