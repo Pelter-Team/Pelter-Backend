@@ -1,13 +1,14 @@
 package user
 
 import (
+	"Pelter_backend/internal/dto"
 	"Pelter_backend/internal/entity"
 	"Pelter_backend/internal/pkg/bcrypt"
 	"Pelter_backend/internal/pkg/jwt"
 	"context"
 	"errors"
 
-	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type (
@@ -16,9 +17,8 @@ type (
 	}
 
 	UserUsecase interface {
-		Register(pctx context.Context, user *entity.User) error
-		Login(pctx context.Context, email, password string) (*entity.User, string, error)
-		Logout(ctx *fiber.Ctx) error
+		Register(pctx context.Context, user *entity.User) (dto.LoginResponse, string, error)
+		Login(pctx context.Context, email, password string) (dto.LoginResponse, string, error)
 	}
 )
 
@@ -28,38 +28,58 @@ func NewUserUsecase(userRepo UserRepository) UserUsecase {
 	}
 }
 
-func (u *userUsecase) Register(pctx context.Context, user *entity.User) error {
+func (u *userUsecase) Register(pctx context.Context, user *entity.User) (dto.LoginResponse, string, error) {
+	count, err := u.userRepo.CountUserByEmail(pctx, user.Email)
+	if errors.Is(err, gorm.ErrDuplicatedKey) || count == 1 {
+		return dto.LoginResponse{}, "", errors.New("email already registered")
+	}
 
-	existingUser, err := u.userRepo.FindByEmail(pctx, user.Email)
-	if err == nil && existingUser != nil {
-		return errors.New("email already registered")
+	if err != nil {
+		return dto.LoginResponse{}, "", errors.New("failed to find user by email")
 	}
 
 	hashedPwd, _ := bcrypt.HashPassword(user.Password)
 	user.Password = string(hashedPwd)
 
-	return u.userRepo.Create(pctx, user)
-}
-
-func (u *userUsecase) Login(pctx context.Context, email string, password string) (*entity.User, string, error) {
-	user, err := u.userRepo.FindByEmail(pctx, email)
-	if err != nil {
-		return nil, "", err
-	}
-
-	if !bcrypt.CheckPassword(user.Password, password) {
-		return nil, "", errors.New("invalid credentials")
+	if err := u.userRepo.Create(pctx, user); err != nil {
+		return dto.LoginResponse{}, "", err
 	}
 	token, err := jwt.GenerateToken(user.ID)
 	if err != nil {
-		return nil, "", err
+		return dto.LoginResponse{}, "", err
 	}
 
-	return user, token, nil
+	// NOTE: return as need not the whole struct
+	return dto.LoginResponse{
+		UserID: user.ID,
+		FirstName: user.Name,
+		Surname: user.Surname,
+		Email: user.Email,
+		ProfileURL: *user.ProfileURL,
+		Role: string(user.Role),
+	}, token, nil
 }
 
-func (u *userUsecase) Logout(ctx *fiber.Ctx) error {
-	_ = u.userRepo.Logout(ctx.Context())
-	ctx.ClearCookie("access_token")
-	return nil
+func (u *userUsecase) Login(pctx context.Context, email string, password string) (dto.LoginResponse, string, error) {
+	user, err := u.userRepo.FindByEmail(pctx, email)
+	if err != nil {
+		return dto.LoginResponse{}, "", err
+	}
+
+	if !bcrypt.CheckPassword(user.Password, password) {
+		return dto.LoginResponse{}, "", errors.New("invalid credentials")
+	}
+	token, err := jwt.GenerateToken(user.ID)
+	if err != nil {
+		return dto.LoginResponse{}, "", err
+	}
+
+	return dto.LoginResponse{
+		UserID: user.ID,
+		FirstName: user.Name,
+		Surname: user.Surname,
+		Email: user.Email,
+		ProfileURL: *user.ProfileURL,
+		Role: string(user.Role),
+	}, token, nil
 }

@@ -12,7 +12,9 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	repo := NewUserRepository(gorm)
 	usecase := NewUserUsecase(repo)
 	service := NewUserService(usecase)
-	app.Post("/register", middleware.ValidationMiddleware(&dto.RegisterRequest{}), service.Register)
-	app.Post("/login", middleware.ValidationMiddleware(&dto.LoginRequest{}), service.Login)
-	app.Get("/logout", middleware.ValidateCookie, service.Logout)
+
+	route := app.Group("/auth")
+	route.Post("/register", middleware.ValidationMiddleware(&dto.RegisterRequest{}), service.Register)
+	route.Post("/login", middleware.ValidationMiddleware(&dto.LoginRequest{}), service.Login)
+	route.Get("/logout", service.Logout)
 }

@@ -1,7 +1,5 @@
 package dto
 
-import "time"
-
 type RegisterRequest struct {
 	Name           string  `json:"name" validate:"required"`
 	Surname        string  `json:"surname" validate:"required"`
@@ -21,19 +19,10 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	UserID      uint   `json:"user_id"`
-	AccessToken string `json:"access_token"`
-}
-
-type CookieRequest struct {
-	Name        string    `cookie:"name"`
-	Value       string    `cookie:"value"`
-	Path        string    `cookie:"path"`
-	Domain      string    `cookie:"domain"`
-	MaxAge      int       `cookie:"max_age"`
-	Expires     time.Time `cookie:"expires"`
-	Secure      bool      `cookie:"secure"`
-	HTTPOnly    bool      `cookie:"http_only"`
-	SameSite    string    `cookie:"same_site"`
-	SessionOnly bool      `cookie:"session_only"`
+	UserID     uint   `json:"userId"`
+	Email      string `json:"email"`
+	FirstName  string `json:"firstname"`
+	Surname    string `json:"surname"`
+	Role       string `json:"role"`
+	ProfileURL string `json:"profileUrl"`
 }
