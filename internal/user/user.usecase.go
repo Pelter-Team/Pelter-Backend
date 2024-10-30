@@ -2,12 +2,10 @@ package user
 
 import (
 	"Pelter_backend/internal/entity"
-	"context"
-	"errors"
-	"os"
-
 	"Pelter_backend/internal/pkg/bcrypt"
 	"Pelter_backend/internal/pkg/jwt"
+	"context"
+	"errors"
 )
 
 type (
@@ -49,7 +47,7 @@ func (u *userUsecase) Login(ctx context.Context, email, password string) (*entit
 	if !bcrypt.CheckPassword(user.Password, password) {
 		return nil, "", errors.New("invalid credentials")
 	}
-	token, err := jwt.GenerateToken(user.ID, []byte(os.Getenv("JWT_SECRET")))
+	token, err := jwt.GenerateToken(user.ID)
 	if err != nil {
 		return nil, "", err
 	}

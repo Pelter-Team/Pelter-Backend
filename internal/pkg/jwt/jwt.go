@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -16,7 +17,7 @@ func ValidateToken(tokenString string, secret []byte) (jwt.Claims, error) {
 	return token.Claims, nil
 }
 
-func GenerateToken(id uint, secret []byte) (string, error) {
+func GenerateToken(id uint) (string, error) {
 	// create a new claims
 	claims := jwt.MapClaims{
 		"Subject":   id,
@@ -26,7 +27,7 @@ func GenerateToken(id uint, secret []byte) (string, error) {
 		"Issuer":    "pelter",
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(secret)
+	return token.SignedString(os.Getenv("JWT_SECRET"))
 }
 
 func GetIDFromToken(tokenString string, secret []byte) (string, error) {
