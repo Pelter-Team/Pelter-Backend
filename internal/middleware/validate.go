@@ -34,43 +34,21 @@ func ValidationMiddleware(s interface{}) fiber.Handler {
 	}
 }
 
-// func ValidateCookie(ctx *fiber.Ctx) error {
-// 	c := new(dto.Cookie)
-// 	if err := ctx.CookieParser(c); err != nil {
-// 		return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
-// 			Error: "FicUnauthorized",
-// 		})
-// 	}
-
-// 	// ctx.Locals("cookie", cookie.value)
-// 	claims, err := jwt.ValidateToken(c.Value)
-// 	if err != nil {
-// 		return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
-// 			Error: "Unauthorized " + err.Error(),
-// 		})
-// 	}
-
-// 	ctx.Locals("claims", claims)
-
-// 	return ctx.Next()
-
-// }
-
 func ValidateCookie(ctx *fiber.Ctx) error {
 	cookieValue := ctx.Cookies("access_token")
+	// fmt.Println("accessed")
 	if cookieValue == "" {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
 			Error: "Unauthorized: missing cookie",
 		})
 	}
 
-	claims, err := jwt.ValidateToken(cookieValue)
+	_, err := jwt.ValidateToken(cookieValue)
 	if err != nil {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
 			Error: "Unauthorized: " + err.Error(),
 		})
 	}
-
-	ctx.Locals("claims", claims)
+	// ctx.Locals("claims", claims)
 	return ctx.Next()
 }

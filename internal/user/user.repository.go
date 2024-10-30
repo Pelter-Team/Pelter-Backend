@@ -16,6 +16,7 @@ type (
 	UserRepository interface {
 		Create(pctx context.Context, user *entity.User) error
 		FindByEmail(pctx context.Context, email string) (*entity.User, error)
+		Logout(pctx context.Context) error
 	}
 )
 
@@ -43,4 +44,8 @@ func (r *userRepository) FindByID(pctx context.Context, id uint) (*entity.User, 
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *userRepository) Logout(pctx context.Context) error {
+	return nil
 }

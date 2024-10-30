@@ -18,10 +18,3 @@ func SetCookie(ctx *fiber.Ctx, name, token string) {
 	ctx.Cookie(cookie)
 }
 
-func GetCookie(ctx *fiber.Ctx) (*fiber.Cookie, error) {
-	c := new(fiber.Cookie)
-	if err := ctx.CookieParser(c); err != nil {
-		return nil, err
-	}
-	return c, nil
-}

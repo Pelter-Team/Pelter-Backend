@@ -6,6 +6,8 @@ import (
 	"Pelter_backend/internal/pkg/jwt"
 	"context"
 	"errors"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type (
@@ -16,6 +18,7 @@ type (
 	UserUsecase interface {
 		Register(pctx context.Context, user *entity.User) error
 		Login(pctx context.Context, email, password string) (*entity.User, string, error)
+		Logout(ctx *fiber.Ctx) error
 	}
 )
 
@@ -25,9 +28,9 @@ func NewUserUsecase(userRepo UserRepository) UserUsecase {
 	}
 }
 
-func (u *userUsecase) Register(ctx context.Context, user *entity.User) error {
+func (u *userUsecase) Register(pctx context.Context, user *entity.User) error {
 
-	existingUser, err := u.userRepo.FindByEmail(ctx, user.Email)
+	existingUser, err := u.userRepo.FindByEmail(pctx, user.Email)
 	if err == nil && existingUser != nil {
 		return errors.New("email already registered")
 	}
@@ -35,11 +38,11 @@ func (u *userUsecase) Register(ctx context.Context, user *entity.User) error {
 	hashedPwd, _ := bcrypt.HashPassword(user.Password)
 	user.Password = string(hashedPwd)
 
-	return u.userRepo.Create(ctx, user)
+	return u.userRepo.Create(pctx, user)
 }
 
-func (u *userUsecase) Login(ctx context.Context, email string, password string) (*entity.User, string, error) {
-	user, err := u.userRepo.FindByEmail(ctx, email)
+func (u *userUsecase) Login(pctx context.Context, email string, password string) (*entity.User, string, error) {
+	user, err := u.userRepo.FindByEmail(pctx, email)
 	if err != nil {
 		return nil, "", err
 	}
@@ -53,4 +56,10 @@ func (u *userUsecase) Login(ctx context.Context, email string, password string) 
 	}
 
 	return user, token, nil
+}
+
+func (u *userUsecase) Logout(ctx *fiber.Ctx) error {
+	_ = u.userRepo.Logout(ctx.Context())
+	ctx.ClearCookie("access_token")
+	return nil
 }

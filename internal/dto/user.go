@@ -25,7 +25,7 @@ type LoginResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
-type Cookie struct {
+type CookieRequest struct {
 	Name        string    `cookie:"name"`
 	Value       string    `cookie:"value"`
 	Path        string    `cookie:"path"`

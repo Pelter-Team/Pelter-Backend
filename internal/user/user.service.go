@@ -19,6 +19,7 @@ type (
 	UserService interface {
 		Register(ctx *fiber.Ctx) error
 		Login(ctx *fiber.Ctx) error
+		Logout(ctx *fiber.Ctx) error
 	}
 )
 
@@ -86,5 +87,17 @@ func (s *userService) Login(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(dto.LoginResponse{
 		UserID:      user.ID,
 		AccessToken: "Created",
+	})
+}
+
+func (s *userService) Logout(ctx *fiber.Ctx) error {
+	err := s.userUsecase.Logout(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error: "Failed to logout",
+		})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result: "Logged out successfully",
 	})
 }
