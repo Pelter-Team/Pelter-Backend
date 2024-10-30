@@ -2,10 +2,13 @@ package gorm
 
 import (
 	"Pelter_backend/internal/config"
+
 	"errors"
+
 	"fmt"
 
 	"gorm.io/driver/postgres"
+
 	"gorm.io/gorm"
 
 	"Pelter_backend/internal/entity"
@@ -27,10 +30,26 @@ func DbConn(cfg *config.Db) (*gorm.DB, error) {
 	if err != nil {
 		return nil, errors.New("failed to connect database")
 	}
-	db.Exec("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'role_type') THEN CREATE TYPE role_type AS ENUM ('admin', 'customer', 'seller', 'foundation'); END IF; END $$;")
+	if err := db.Exec("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'role_type') THEN CREATE TYPE role_type AS ENUM ('admin', 'customer', 'seller', 'foundation'); END IF; END $$;").Error; err != nil {
+		return nil, errors.New("failed to create ENUM before automigrate")
+	}
 
-	// Migrate the schema
-	db.AutoMigrate(&entity.Product{}, &entity.User{}, &entity.Review{}, &entity.Transaction{})
+	// prevent errors when creating tables
+	err = db.AutoMigrate(&entity.User{})
+	if err != nil {
+		return nil, errors.New("failed to migrate schema")
+	}
+
+	err = db.AutoMigrate(&entity.Product{}, &entity.Review{}, &entity.Transaction{})
+	if err != nil {
+		return nil, errors.New("failed to migrate schema")
+	}
+
+	// err = db.AutoMigrate(&entity.Product{}, &entity.User{}, &entity.Review{}, &entity.Transaction{})
+	// if err != nil {
+	// 	return nil, errors.New("failed to migrate schema")
+	// }
+
 	// Create
 	// db.Create(&Product{Code: "D42", Price: 100})
 

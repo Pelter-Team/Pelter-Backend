@@ -25,8 +25,10 @@ WORKDIR /app
 # Copy the binary from the builder stage
 COPY --from=builder /app/bin/app /bin/app
 
+COPY .env .env
+
 # Expose the port the app runs on
-EXPOSE 8080
+EXPOSE ${PORT}
 
 # Command to run the Go app
-CMD ["/bin/app"]
+CMD ["sh", "-c" , "/bin/app"]

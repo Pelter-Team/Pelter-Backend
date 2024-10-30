@@ -1,6 +1,9 @@
 package user
 
 import (
+	"Pelter_backend/internal/dto"
+	"Pelter_backend/internal/middleware"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -10,6 +13,8 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	usecase := NewUserUsecase(repo)
 	service := NewUserService(usecase)
 
-	group := app.Group("/users")
-	group.Get("/", service.InsertUser)
+	route := app.Group("/auth")
+	route.Post("/register", middleware.ValidationMiddleware(&dto.RegisterRequest{}), service.Register)
+	route.Post("/login", middleware.ValidationMiddleware(&dto.LoginRequest{}), service.Login)
+	route.Get("/logout", service.Logout)
 }

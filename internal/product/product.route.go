@@ -1,6 +1,8 @@
 package product
 
 import (
+	"Pelter_backend/internal/middleware"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -11,5 +13,5 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	service := NewProductService(usecase)
 
 	group := app.Group("/products")
-	group.Get("/", service.InsertProduct)
+	group.Get("/", middleware.ValidateCookie, service.InsertProduct)
 }

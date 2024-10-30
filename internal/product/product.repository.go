@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	repository struct {
+	productRepository struct {
 		Db *gorm.DB
 	}
 	ProductRepository interface {
@@ -16,15 +16,15 @@ type (
 )
 
 func NewProductRepository(db *gorm.DB) ProductRepository {
-	return &repository{
+	return &productRepository{
 		Db: db,
 	}
 }
 
-func (r *repository) InsertProduct(pctx context.Context) error {
+func (r *productRepository) InsertProduct(pctx context.Context) error {
 	return nil
 }
 
-func (r *repository) DeleteProduct(pctx context.Context) error {
+func (r *productRepository) DeleteProduct(pctx context.Context) error {
 	return nil
 }

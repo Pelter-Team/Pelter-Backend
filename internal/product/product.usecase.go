@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	usecase struct {
+	productUsecase struct {
 		productRepo ProductRepository
 	}
 	ProductUsecase interface {
@@ -14,12 +14,12 @@ type (
 )
 
 func NewProductUsecase(productRepo ProductRepository) ProductUsecase {
-	return &usecase{
+	return &productUsecase{
 		productRepo: productRepo,
 	}
 }
 
-func (r *usecase) InsertProduct(pctx context.Context) error {
-	_ = r.productRepo.InsertProduct(pctx)
+func (u *productUsecase) InsertProduct(pctx context.Context) error {
+	_ = u.productRepo.InsertProduct(pctx)
 	return nil
 }

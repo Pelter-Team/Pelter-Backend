@@ -22,7 +22,6 @@ func Start(pctx context.Context, cfg *config.App, app *fiber.App, gorm *gorm.DB)
 		cfg: cfg,
 		app: app,
 	}
-	_ = s.cfg
 
 	product.Route(s.app, gorm)
 	user.Route(s.app, gorm)

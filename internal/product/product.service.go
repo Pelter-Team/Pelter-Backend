@@ -21,10 +21,10 @@ func NewProductService(productUsecase ProductUsecase) ProductService {
 	}
 }
 
-func (r *productService) InsertProduct(ctx *fiber.Ctx) error {
-	_ = r.productUsecase.InsertProduct(ctx.Context())
+func (s *productService) InsertProduct(ctx *fiber.Ctx) error {
+	_ = s.productUsecase.InsertProduct(ctx.Context())
 
-	return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
-		Error: "Bad Request",
+	return ctx.Status(fiber.StatusAccepted).JSON(dto.HttpResponse{
+		Result: "Authenticated",
 	})
 }

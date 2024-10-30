@@ -4,24 +4,56 @@ import (
 	"context"
 
 	"gorm.io/gorm"
+
+	"Pelter_backend/internal/entity"
 )
 
 type (
-	repository struct {
+	userRepository struct {
 		Db *gorm.DB
 	}
 
 	UserRepository interface {
-		RegisterUser(pctx context.Context) error
+		Create(pctx context.Context, user *entity.User) error
+		FindByEmail(pctx context.Context, email string) (entity.User, error)
+		CountUserByEmail(pctx context.Context, email string) (int64, error)
 	}
 )
 
+func (r *userRepository) userTable(pctx context.Context) (*gorm.DB) {
+	return r.Db.Table("users").WithContext(pctx)
+}
+
 func NewUserRepository(db *gorm.DB) UserRepository {
-	return &repository{
+	return &userRepository{
 		Db: db,
 	}
 }
 
-func (r *repository) RegisterUser(pctx context.Context) error {
-	return nil
+func (r *userRepository) Create(pctx context.Context, user *entity.User) error {
+	return r.userTable(pctx).Create(user).Error
+}
+
+func (r *userRepository) FindByEmail(pctx context.Context, email string) (entity.User, error) {
+	var user entity.User
+	if err := r.userTable(pctx).Where("email = ?", email).First(&user).Error; err != nil {
+		return entity.User{}, err
+	}
+	return user, nil
+}
+
+func (r *userRepository) CountUserByEmail(pctx context.Context, email string) (int64, error) {
+	count := new(int64)
+	if err := r.userTable(pctx).Where("email = ?", email).Count(count).Error; err != nil {
+		return -1, err
+	}
+	return *count, nil
+}
+
+func (r *userRepository) FindByID(pctx context.Context, id uint) (*entity.User, error) {
+	var user entity.User
+	if err := r.userTable(pctx).Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
