@@ -2,11 +2,14 @@ package user
 
 import (
 	"Pelter_backend/internal/dto"
+
 	"context"
 
 	"Pelter_backend/internal/entity"
 
 	"github.com/gofiber/fiber/v2"
+
+	"Pelter_backend/internal/utils"
 )
 
 type (
@@ -26,7 +29,7 @@ func NewUserService(userUsecase UserUsecase) UserService {
 }
 
 func (s *userService) Register(ctx *fiber.Ctx) error {
-	var req dto.RegisterRequest
+	var req *dto.RegisterRequest
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
 			Error: "Invalid request format",
@@ -63,12 +66,8 @@ func (s *userService) Register(ctx *fiber.Ctx) error {
 }
 
 func (s *userService) Login(ctx *fiber.Ctx) error {
-	var req dto.LoginRequest
-	if err := ctx.BodyParser(&req); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
-			Error: "Invalid login format",
-		})
-	}
+
+	req := ctx.Locals("body").(*dto.LoginRequest)
 
 	user, token, err := s.userUsecase.Login(context.Background(), req.Email, req.Password)
 	if err != nil {
@@ -82,8 +81,10 @@ func (s *userService) Login(ctx *fiber.Ctx) error {
 		})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(dto.AuthResponse{
+	utils.SetCookie(ctx, "access_token", token) // set token in cookie
+
+	return ctx.Status(fiber.StatusOK).JSON(dto.LoginResponse{
 		UserID:      user.ID,
-		AccessToken: token,
+		AccessToken: "Created",
 	})
 }

@@ -12,6 +12,7 @@ type (
 		App        App
 		Database   Db
 		Cloudinary Cloudinary
+		JWT        JWT
 	}
 
 	App struct {
@@ -36,6 +37,10 @@ type (
 		Cloudname string
 		Apikey    string
 		Apisecret string
+	}
+
+	JWT struct {
+		Secret string
 	}
 )
 
@@ -64,10 +69,9 @@ func LoadConfig() *Config {
 			Apikey:    os.Getenv("APIKEY"),
 			Apisecret: os.Getenv("APISECRET"),
 		},
+		JWT: JWT{
+			Secret: os.Getenv("JWT_SECRET"),
+		},
 	}
 	return cfg
 }
-
-//func (d *Database) DbConn() {
-//	fmt.Println(d.DatabaseUrl)
-//}

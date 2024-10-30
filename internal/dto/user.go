@@ -1,9 +1,5 @@
 package dto
 
-import (
-	"github.com/golang-jwt/jwt/v5"
-)
-
 type RegisterRequest struct {
 	Name           string  `json:"name" validate:"required"`
 	Surname        string  `json:"surname" validate:"required"`
@@ -20,7 +16,11 @@ type RegisterRequest struct {
 type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
-	jwt.RegisteredClaims
+}
+
+type LoginResponse struct {
+	UserID      uint   `json:"user_id"`
+	AccessToken string `json:"access_token"`
 }
 
 type AuthResponse struct { // response data for auth
