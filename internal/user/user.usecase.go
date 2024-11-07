@@ -18,7 +18,7 @@ type (
 
 	UserUsecase interface {
 		Register(pctx context.Context, user *entity.User) (dto.LoginResponse, string, error)
-		Login(pctx context.Context, email, password string) (dto.LoginResponse, string, error)
+		Login(pctx context.Context, email string, password string) (dto.LoginResponse, string, error)
 	}
 )
 
@@ -51,12 +51,12 @@ func (u *userUsecase) Register(pctx context.Context, user *entity.User) (dto.Log
 
 	// NOTE: return as need not the whole struct
 	return dto.LoginResponse{
-		UserID: user.ID,
-		FirstName: user.Name,
-		Surname: user.Surname,
-		Email: user.Email,
-		ProfileURL: *user.ProfileURL,
-		Role: string(user.Role),
+		UserID:     user.ID,
+		FirstName:  user.Name,
+		Surname:    user.Surname,
+		Email:      user.Email,
+		ProfileURL: user.ProfileURL,
+		Role:       string(user.Role),
 	}, token, nil
 }
 
@@ -75,11 +75,11 @@ func (u *userUsecase) Login(pctx context.Context, email string, password string)
 	}
 
 	return dto.LoginResponse{
-		UserID: user.ID,
-		FirstName: user.Name,
-		Surname: user.Surname,
-		Email: user.Email,
-		ProfileURL: *user.ProfileURL,
-		Role: string(user.Role),
+		UserID:     user.ID,
+		FirstName:  user.Name,
+		Surname:    user.Surname,
+		Email:      user.Email,
+		ProfileURL: user.ProfileURL,
+		Role:       string(user.Role),
 	}, token, nil
 }

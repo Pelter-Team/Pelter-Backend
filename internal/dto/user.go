@@ -19,10 +19,10 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	UserID     uint   `json:"userId"`
-	Email      string `json:"email"`
-	FirstName  string `json:"firstname"`
-	Surname    string `json:"surname"`
-	Role       string `json:"role"`
-	ProfileURL string `json:"profileUrl"`
+	UserID     uint    `json:"userId"`
+	FirstName  string  `json:"firstname"`
+	Surname    string  `json:"surname"`
+	Email      string  `json:"email"`
+	ProfileURL *string `json:"profileUrl"`
+	Role       string  `json:"role"`
 }
