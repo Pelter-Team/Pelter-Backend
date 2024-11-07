@@ -3,7 +3,6 @@ package user
 import (
 	"Pelter_backend/internal/dto"
 	"errors"
-	"fmt"
 
 	"Pelter_backend/internal/entity"
 
@@ -54,12 +53,12 @@ func (s *userService) Register(ctx *fiber.Ctx) error {
 	if err != nil {
 		if err.Error() == "email already registered" { // check error from use case
 			return ctx.Status(fiber.StatusConflict).JSON(dto.HttpResponse{
-				Error: "Email already registered",
+				Error:   "Email already registered",
 				Success: false,
 			})
 		}
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
-			Error: "Failed to create user",
+			Error:   "Failed to create user",
 			Success: false,
 		})
 	}
@@ -79,17 +78,17 @@ var (
 func (s *userService) Login(ctx *fiber.Ctx) error {
 
 	req := ctx.Locals("body").(*dto.LoginRequest)
-	
+
 	user, token, err := s.userUsecase.Login(ctx.UserContext(), req.Email, req.Password)
 	if err != nil {
 		if errors.Is(err, ErrInvalidCredential) {
 			return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
-				Error: "Invalid email or password",
+				Error:   "Invalid email or password",
 				Success: false,
 			})
 		}
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
-			Error: "Failed to login" + err.Error(),
+			Error:   "Failed to login" + err.Error(),
 			Success: false,
 		})
 	}
