@@ -14,4 +14,5 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	route.Post("/buy", service.Buy)
 	route.Get("/:id", service.FindById)
 	route.Get("/", service.ListAllTransactions)
+	route.Get("/user/:id", service.ListAllTransactionsByUserId)
 }

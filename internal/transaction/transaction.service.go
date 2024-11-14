@@ -3,6 +3,7 @@ package transaction
 import (
 	"Pelter_backend/internal/dto"
 	"Pelter_backend/internal/entity"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,6 +16,7 @@ type (
 		Buy(ctx *fiber.Ctx) error
 		FindById(ctx *fiber.Ctx) error
 		ListAllTransactions(ctx *fiber.Ctx) error
+		ListAllTransactionsByUserId(ctx *fiber.Ctx) error
 	}
 )
 
@@ -34,7 +36,6 @@ func (s *transactionService) Buy(ctx *fiber.Ctx) error {
 	txn := entity.Transaction{
 		ProductID: req.ProductID,
 		BuyerID:   req.BuyerID,
-		SellerID:  req.SellerID,
 	}
 	if err := s.transactionUsecase.Buy(ctx.UserContext(), &txn); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
@@ -67,6 +68,24 @@ func (s *transactionService) FindById(ctx *fiber.Ctx) error {
 
 func (s *transactionService) ListAllTransactions(ctx *fiber.Ctx) error {
 	txns, err := s.transactionUsecase.ListAll(ctx.UserContext())
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error: err.Error(),
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(txns)
+}
+
+func (s *transactionService) ListAllTransactionsByUserId(ctx *fiber.Ctx) error {
+	id, err := ctx.ParamsInt("id")
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error: err.Error(),
+		})
+	}
+
+	txns, err := s.transactionUsecase.ListAllByUserId(ctx.UserContext(), uint(id))
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error: err.Error(),
