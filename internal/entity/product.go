@@ -7,6 +7,7 @@ type Product struct {
 	UserID         uint
 	TransactionID  uint
 	ReviewID       []Review
+	Name           string
 	IsSold         bool
 	Category       string
 	Subcategory    string
@@ -17,5 +18,4 @@ type Product struct {
 	VaccineBookURL *string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
-	Transaction    uint
 }
