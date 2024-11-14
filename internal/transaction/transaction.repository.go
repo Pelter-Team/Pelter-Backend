@@ -1,11 +1,11 @@
 package transaction
 
 import (
+	"Pelter_backend/internal/entity"
+	
 	"context"
 
 	"gorm.io/gorm"
-
-	"Pelter_backend/internal/entity"
 )
 
 type (
@@ -16,7 +16,7 @@ type (
 	TransactionRepository interface {
 		CreateTransaction(ctx context.Context, txn *entity.Transaction) error
 		FindById(ctx context.Context, id uint) (*entity.Transaction, error)
-		ListAll(ctx context.Context) error
+		ListAll(ctx context.Context) ([]*entity.Transaction, error)
 	}
 )
 
@@ -31,6 +31,9 @@ func NewTransactionRepository(db *gorm.DB) TransactionRepository {
 }
 
 func (r *transactionRepository) CreateTransaction(pctx context.Context, txn *entity.Transaction) error {
+	if err := r.transactionTable(pctx).Where("product_id = ?", txn.ProductID).First(&txn).Error; err == nil {
+		return gorm.ErrDuplicatedKey
+	}
 	return r.transactionTable(pctx).Create(txn).Error
 }
 
@@ -42,6 +45,10 @@ func (r *transactionRepository) FindById(pctx context.Context, id uint) (*entity
 	return &txn, nil
 }
 
-func (r *transactionRepository) ListAll(pctx context.Context) error {
-	return r.transactionTable(pctx).Find(&[]entity.Transaction{}).Error
+func (r *transactionRepository) ListAll(pctx context.Context) ([]*entity.Transaction, error) {
+	var txns []*entity.Transaction
+	if err := r.transactionTable(pctx).Find(&txns).Error; err != nil {
+		return nil, err
+	}
+	return txns, nil
 }
