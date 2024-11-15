@@ -3,6 +3,7 @@ package server
 import (
 	"Pelter_backend/internal/config"
 	"Pelter_backend/internal/product"
+	"Pelter_backend/internal/transaction"
 	"Pelter_backend/internal/user"
 	"context"
 
@@ -25,4 +26,5 @@ func Start(pctx context.Context, cfg *config.App, app *fiber.App, gorm *gorm.DB)
 
 	product.Route(s.app, gorm)
 	user.Route(s.app, gorm)
+	transaction.Route(s.app, gorm)
 }
