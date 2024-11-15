@@ -5,8 +5,7 @@ import "time"
 type Product struct {
 	ID             uint `gorm:"primary_key"`
 	UserID         uint
-	TransactionID  uint
-	ReviewID       []Review
+	Review         []Review
 	Name           string
 	IsSold         bool
 	Category       string
