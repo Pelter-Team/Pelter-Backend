@@ -52,7 +52,5 @@ func GetIDFromToken(tokenString string) (uint, error) {
 		return 0, errors.New("get-id-from-token: cannot validate token")
 	}
 
-	fmt.Println(tokenClaims.UserId)
-
 	return tokenClaims.UserId, nil
 }
