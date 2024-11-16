@@ -36,7 +36,7 @@ func ValidationMiddleware(s interface{}) fiber.Handler {
 
 func ValidateCookie(ctx *fiber.Ctx) error {
 	cookieValue := ctx.Cookies("access_token")
-	// fmt.Println("accessed")
+
 	if cookieValue == "" {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
 			Error: "Unauthorized: missing cookie",
