@@ -66,7 +66,7 @@ func (s *productService) InsertProduct(ctx *fiber.Ctx) error {
 		})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+	return ctx.Status(fiber.StatusCreated).JSON(dto.HttpResponse{
 		Result:  productRes,
 		Success: true,
 	})

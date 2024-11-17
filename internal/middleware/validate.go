@@ -52,3 +52,20 @@ func ValidateCookie(ctx *fiber.Ctx) error {
 	// ctx.Locals("claims", claims)
 	return ctx.Next()
 }
+
+// func ValidateRole(ctx *fiber.Ctx) error {
+// 	claims, err := jwt.ValidateToken(ctx.Cookies("access_token"))
+// 	if err != nil {
+// 		return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
+// 			Error: "Unauthorized: " + err.Error(),
+// 		})
+// 	}
+
+// 	role := claims["role"].(string)
+// 	if role != "admin" {
+// 		return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
+// 			Error: "Unauthorized: invalid role",
+// 		})
+// 	}
+// 	return ctx.Next()
+// }

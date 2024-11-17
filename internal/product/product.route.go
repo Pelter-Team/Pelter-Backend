@@ -18,7 +18,7 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	group := app.Group("/product")
 	group.Get(("/:id"), service.GetProductByID)
 
-	// below = secure (need to implement validateRole)
+	//TODO: below = secure (need to implement validateRole)
 	group.Post("/add", middleware.ValidateCookie, service.InsertProduct)
 	group.Put(("/:id"), middleware.ValidateCookie, service.UpdateProduct)
 	group.Delete(("/:id"), middleware.ValidateCookie, service.DeleteProduct)
