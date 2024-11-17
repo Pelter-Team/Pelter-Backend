@@ -73,7 +73,7 @@ func (s *productService) InsertProduct(ctx *fiber.Ctx) error {
 }
 
 func (s *productService) GetProduct(ctx *fiber.Ctx) error {
-	products, err := s.productUsecase.GetProduct(ctx.Context())
+	products, err := s.productUsecase.GetProduct(ctx.UserContext())
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error:   "Failed to get product",
@@ -96,7 +96,7 @@ func (s *productService) GetProductByID(ctx *fiber.Ctx) error {
 		})
 	}
 
-	product, err := s.productUsecase.GetProductByID(ctx.Context(), uint(id))
+	product, err := s.productUsecase.GetProductByID(ctx.UserContext(), uint(id))
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error:   err.Error(),
@@ -148,7 +148,7 @@ func (s *productService) UpdateProduct(ctx *fiber.Ctx) error {
 		VaccineBookURL: req.VaccineBookURL,
 	}
 
-	err = s.productUsecase.UpdateProduct(ctx.Context(), &updateProduct, uint(id), userId)
+	err = s.productUsecase.UpdateProduct(ctx.UserContext(), &updateProduct, uint(id), userId)
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error:   err.Error(),
@@ -157,7 +157,7 @@ func (s *productService) UpdateProduct(ctx *fiber.Ctx) error {
 	}
 
 	// Get updated product and response
-	product, err := s.productUsecase.GetProductByID(ctx.Context(), uint(id))
+	product, err := s.productUsecase.GetProductByID(ctx.UserContext(), uint(id))
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error:   err.Error(),
@@ -189,7 +189,7 @@ func (s *productService) DeleteProduct(ctx *fiber.Ctx) error {
 		})
 	}
 
-	err = s.productUsecase.DeleteProduct(ctx.Context(), userId, uint(id))
+	err = s.productUsecase.DeleteProduct(ctx.UserContext(), userId, uint(id))
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error:   err.Error(),
