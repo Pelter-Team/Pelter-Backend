@@ -57,7 +57,7 @@ func (s *productService) InsertProduct(ctx *fiber.Ctx) error {
 		VaccineBookURL: req.VaccineBookURL,
 	}
 
-	productRes, err := s.productUsecase.InsertProduct(ctx.Context(), &product)
+	productRes, err := s.productUsecase.InsertProduct(ctx.UserContext(), &product)
 
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
