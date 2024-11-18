@@ -3,10 +3,12 @@ package product
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
 	"Pelter_backend/internal/entity"
+	"Pelter_backend/internal/utils"
 )
 
 type (
@@ -18,7 +20,9 @@ type (
 		GetProductByID(pctx context.Context, productId uint) (entity.Product, error)
 		InsertProduct(pctx context.Context, product *entity.Product) (uint, error)
 		UpdateProduct(pctx context.Context, product *entity.Product, productId uint, userId uint) error
-		DeleteProduct(pctx context.Context, userId uint, productId uint) error
+		DeleteProduct(pctx context.Context, productId uint, userId uint) error
+		UpdateProductAdmin(pctx context.Context, product *entity.Product, productId uint, userId uint) error
+		DeleteProductAdmin(pctx context.Context, productId uint, userId uint) error
 	}
 )
 
@@ -56,26 +60,69 @@ func (r *productRepository) GetProductByID(pctx context.Context, productId uint)
 }
 
 func (r *productRepository) UpdateProduct(pctx context.Context, product *entity.Product, productId uint, userId uint) error {
-	query := r.productTable(pctx).Where("id = ? AND user_id = ?", productId, userId).Updates(product)
-	if query.Error != nil {
-		return query.Error
+	isOwner, err := utils.IsOwner(pctx, r.Db, userId, productId)
+	if err != nil {
+		return err
 	}
 
-	if query.RowsAffected == 0 {
-		return errors.New("you don't have permission to edit this product")
+	if !isOwner {
+		fmt.Println("isOwner:", isOwner)
+		return errors.New("unauthorized: user does not have permission to update this product")
+	}
+
+	if err := r.productTable(pctx).Where("id = ? AND user_id = ?", productId, userId).Updates(product).Error; err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (r *productRepository) DeleteProduct(pctx context.Context, userId uint, productId uint) error {
-	query := r.productTable(pctx).Where("id = ? AND user_id = ?", productId, userId).Delete(&entity.Product{})
-	if query.Error != nil {
-		return query.Error
+func (r *productRepository) DeleteProduct(pctx context.Context, productId uint, userId uint) error {
+	isOwner, err := utils.IsOwner(pctx, r.Db, productId, userId)
+	if err != nil {
+		return err
 	}
 
-	if query.RowsAffected == 0 {
-		return errors.New("you don't have permission to delete this product")
+	if !isOwner {
+		return errors.New("unauthorized: user does not have permission to update this product")
+	}
+
+	if err := r.productTable(pctx).Where("id = ? AND user_id = ?", productId, userId).Delete(&entity.Product{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *productRepository) UpdateProductAdmin(pctx context.Context, product *entity.Product, productId uint, userId uint) error {
+	isAdmin, err := utils.IsAdmin(pctx, r.Db, userId)
+	if err != nil {
+		return err
+	}
+
+	if !isAdmin {
+		return errors.New("unauthorized: user does not have permission to update this product")
+	}
+
+	if err := r.productTable(pctx).Where("id = ?", productId).Updates(product).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *productRepository) DeleteProductAdmin(pctx context.Context, productId uint, userId uint) error {
+	isAdmin, err := utils.IsAdmin(pctx, r.Db, userId)
+	if err != nil {
+		return err
+	}
+
+	if !isAdmin {
+		return errors.New("unauthorized: user does not have permission to update this product")
+	}
+
+	if err := r.productTable(pctx).Where("id = ?", productId).Delete(&entity.Product{}).Error; err != nil {
+		return err
 	}
 
 	return nil
