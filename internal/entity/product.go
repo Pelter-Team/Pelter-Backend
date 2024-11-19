@@ -5,7 +5,6 @@ import "time"
 type Product struct {
 	ID             uint `gorm:"primary_key"`
 	UserID         uint
-	TransactionID  uint
 	ReviewID       []Review
 	IsSold         bool
 	Category       string
@@ -17,5 +16,4 @@ type Product struct {
 	VaccineBookURL *string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
-	Transaction    uint
 }

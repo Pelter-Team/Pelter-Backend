@@ -3,7 +3,6 @@ package transaction
 import (
 	"Pelter_backend/internal/dto"
 	"Pelter_backend/internal/entity"
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -33,9 +32,10 @@ func (s *transactionService) Buy(ctx *fiber.Ctx) error {
 			Error: err.Error(),
 		})
 	}
+
 	txn := entity.Transaction{
 		ProductID: req.ProductID,
-		BuyerID:   req.BuyerID,
+		BuyerID:   uint(ctx.Locals("user_id").(int)),
 	}
 	if err := s.transactionUsecase.Buy(ctx.UserContext(), &txn); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{

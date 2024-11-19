@@ -40,5 +40,5 @@ func GetIDFromToken(tokenString string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return claims.(jwt.MapClaims)["Subject"].(string), nil
+	return claims.(jwt.MapClaims)["sub"].(string), nil
 }

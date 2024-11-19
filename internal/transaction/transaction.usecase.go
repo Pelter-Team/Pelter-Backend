@@ -33,11 +33,11 @@ func NewTransactionUsecase(transactionRepo TransactionRepository, userRepo UserR
 
 func (u *transactionUsecase) Buy(ctx context.Context, txn *entity.Transaction) error {
 	// Ensure the product exists
-	if seller_id, err := u.productRepo.FindByID(ctx, txn.ProductID); err != nil {
+	if _, err := u.productRepo.FindByID(ctx, txn.ProductID); err != nil {
 		return errors.New("product not found")
 	}
 	// Ensure the buyer exists
-	if _, err := u.userRepo.FindByID(ctx, txn.BuyerID); err != nil {
+	if seller_id, err := u.userRepo.FindByID(ctx, txn.BuyerID); err != nil {
 		return errors.New("buyer not found")
 	}
 

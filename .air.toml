@@ -2,7 +2,7 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  bin = "./bin/main.exe"
+  bin = "./bin/app.exe"
   cmd = "make run"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor"]
