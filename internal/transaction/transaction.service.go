@@ -47,25 +47,39 @@ func (s *transactionService) CreateTransaction(ctx *fiber.Ctx) error {
 		ProductID: uint(id),
 		BuyerID:   userId,
 	}
-	if err := s.transactionUsecase.CreateTransaction(ctx.UserContext(), &txn); err != nil {
-		if err.Error() == "Product already sold" {
+	newTxn, err := s.transactionUsecase.CreateTransaction(ctx.UserContext(), &txn)
+	if err != nil {
+		switch err.Error() {
+		case "Product already sold":
 			return ctx.Status(fiber.StatusConflict).JSON(dto.HttpResponse{
 				Error:   err.Error(),
 				Success: false,
 			})
+		case "You cannot buy your own product":
+			return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+				Error:   err.Error(),
+				Success: false,
+			})
+		case "Product not found":
+			return ctx.Status(fiber.StatusNotFound).JSON(dto.HttpResponse{
+				Error:   err.Error(),
+				Success: false,
+			})
+		default:
+			return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+				Error:   err.Error(),
+				Success: false,
+			})
 		}
-		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
-			Error:   err.Error(),
-			Success: false,
-		})
 	}
 	return ctx.Status(fiber.StatusCreated).JSON(dto.HttpResponse{
 		Result: dto.TransactionResponse{
-			ID:        txn.ID,
-			ProductID: txn.ProductID,
-			BuyerID:   txn.BuyerID,
-			Amount:    uint(txn.Amount),
-			CreatedAt: txn.CreatedAt.String(),
+			ID:        newTxn.ID,
+			ProductID: newTxn.ProductID,
+			BuyerID:   newTxn.BuyerID,
+			SellerID:  newTxn.SellerID,
+			Amount:    uint(newTxn.Amount),
+			CreatedAt: newTxn.CreatedAt.String(),
 		},
 		Success: true,
 	})

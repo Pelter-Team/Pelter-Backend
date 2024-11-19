@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"Pelter_backend/internal/middleware"
 	"Pelter_backend/internal/product"
 	"Pelter_backend/internal/user"
 
@@ -16,9 +17,9 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	service := NewTransactionService(usecase)
 
 	groups := app.Group("/transactions")
-	groups.Get("/", service.GetTransactions)
+	groups.Get("/", middleware.ValidateCookie, service.GetTransactions)
 	group := app.Group("/transaction")
-	group.Post("/buy/:id", service.CreateTransaction)
-	group.Get("/:id", service.GetTransactionByID)
-	group.Get("/user/:id", service.GetTransactionsByUserID)
+	group.Post("/buy/:id", middleware.ValidateCookie, service.CreateTransaction)
+	group.Get("/:id", middleware.ValidateCookie, service.GetTransactionByID)
+	group.Get("/user/:id", middleware.ValidateCookie, service.GetTransactionsByUserID)
 }
