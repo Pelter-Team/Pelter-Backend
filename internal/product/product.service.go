@@ -91,7 +91,10 @@ func (s *productService) GetProduct(ctx *fiber.Ctx) error {
 func (s *productService) GetProductByID(ctx *fiber.Ctx) error {
 	id, err := utils.ParseIDParam(ctx)
 	if err != nil {
-		return err
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error:   "Invalid ID",
+			Success: false,
+		})
 	}
 
 	product, err := s.productUsecase.GetProductByID(ctx.UserContext(), id)
@@ -111,7 +114,10 @@ func (s *productService) GetProductByID(ctx *fiber.Ctx) error {
 func (s *productService) UpdateProduct(ctx *fiber.Ctx) error {
 	id, err := utils.ParseIDParam(ctx)
 	if err != nil {
-		return err
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error:   "Invalid ID",
+			Success: false,
+		})
 	}
 
 	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
@@ -168,7 +174,10 @@ func (s *productService) UpdateProduct(ctx *fiber.Ctx) error {
 func (s *productService) DeleteProduct(ctx *fiber.Ctx) error {
 	id, err := utils.ParseIDParam(ctx)
 	if err != nil {
-		return err
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error:   "Invalid ID",
+			Success: false,
+		})
 	}
 
 	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
@@ -196,7 +205,10 @@ func (s *productService) DeleteProduct(ctx *fiber.Ctx) error {
 func (s *productService) UpdateProductAdmin(ctx *fiber.Ctx) error {
 	id, err := utils.ParseIDParam(ctx)
 	if err != nil {
-		return err
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error:   "Invalid ID",
+			Success: false,
+		})
 	}
 
 	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
@@ -252,7 +264,10 @@ func (s *productService) UpdateProductAdmin(ctx *fiber.Ctx) error {
 func (s *productService) DeleteProductAdmin(ctx *fiber.Ctx) error {
 	id, err := utils.ParseIDParam(ctx)
 	if err != nil {
-		return err
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error:   "Invalid ID",
+			Success: false,
+		})
 	}
 
 	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
