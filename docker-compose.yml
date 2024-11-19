@@ -15,9 +15,10 @@ services:
       - .:/app
 
   db:
-    image: postgres:13
+    image: postgres:latest
     container_name: go_clean_db
     environment:
+      PGUSER: ${DB_USER}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
@@ -28,7 +29,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5

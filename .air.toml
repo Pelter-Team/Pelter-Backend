@@ -12,9 +12,9 @@ tmp_dir = "tmp"
   full_bin = ""
   include_dir = []
   include_ext = ["go", "html", "css"]
-  kill_delay = "0s"
+  kill_delay = "100s"
   log = "air.log"
-  send_interrupt = false
+  send_interrupt = true
   stop_on_error = true
 
 [color]

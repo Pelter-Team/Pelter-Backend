@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -8,10 +9,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func ValidateToken(tokenString string) (jwt.Claims, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+func ValidateToken(tokenString string) (*Token, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Token{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
 		return []byte(os.Getenv("JWT_SECRET")), nil
@@ -19,26 +20,37 @@ func ValidateToken(tokenString string) (jwt.Claims, error) {
 	if err != nil {
 		return nil, err
 	}
-	return token.Claims, nil
+	if claims, ok := token.Claims.(*Token); ok {
+		return claims, nil
+	}
+	return nil, errors.New("failed to validate token")
+}
+
+type Token struct {
+	jwt.RegisteredClaims
+	UserId uint
 }
 
 func GenerateToken(id uint) (string, error) {
-	// create a new claims
-	claims := jwt.MapClaims{
-		"sub": id,
-		"exp": jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
-		"iat": jwt.NewNumericDate(time.Now()),
-		"nbf": jwt.NewNumericDate(time.Now()),
-		"iss": "pelter",
+	claims := Token{
+		UserId: id,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   "account",
+			Issuer:    "pelter",
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
 
-func GetIDFromToken(tokenString string) (string, error) {
-	claims, err := ValidateToken(tokenString)
+func GetIDFromToken(tokenString string) (uint, error) {
+	tokenClaims, err := ValidateToken(tokenString)
 	if err != nil {
-		return "", err
+		return 0, errors.New("get-id-from-token: cannot validate token")
 	}
-	return claims.(jwt.MapClaims)["sub"].(string), nil
+
+	return tokenClaims.UserId, nil
 }
