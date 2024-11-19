@@ -45,14 +45,14 @@ func (r *transactionRepository) GetTransactions(pctx context.Context) ([]*entity
 }
 
 func (r *transactionRepository) FindByTransactionID(pctx context.Context, ID uint) (*entity.Transaction, error) {
-	var txn entity.Transaction
+	var txn *entity.Transaction
 	if err := r.transactionTable(pctx).Where("id = ?", ID).First(&txn).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, fmt.Errorf("transaction with ID %d not found", ID)
 		}
 		return nil, err
 	}
-	return &txn, nil
+	return txn, nil
 }
 
 func (r *transactionRepository) FindByUserID(ctx context.Context, userID uint) ([]*entity.Transaction, error) {
