@@ -1,7 +1,9 @@
 package dto
 
-type TransactionRequest struct {
-	ProductID uint `json:"product_id"`
-	// BuyerID   uint `json:"buyer_id"`
-	// SellerID  uint `json:"seller_id"`
+type TransactionResponse struct {
+	ID        uint   `json:"id"`
+	ProductID uint   `json:"product_id"`
+	BuyerID   uint   `json:"buyer_id"`
+	Amount    uint   `json:"amount"`
+	CreatedAt string `json:"created_at"`
 }

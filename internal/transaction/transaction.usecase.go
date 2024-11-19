@@ -16,47 +16,60 @@ type (
 	}
 
 	TransactionUsecase interface {
-		Buy(ctx context.Context, txn *entity.Transaction) error
-		FindById(ctx context.Context, id uint) (*entity.Transaction, error)
-		ListAll(ctx context.Context) ([]*entity.Transaction, error)
-		ListAllByUserId(ctx context.Context, id uint) ([]*entity.Transaction, error)
+		CreateTransaction(ctx context.Context, txn *entity.Transaction) error
+		GetTransactions(ctx context.Context) ([]*entity.Transaction, error)
+		GetTransactionByID(ctx context.Context, id uint) (*entity.Transaction, error)
+		GetTransactionsByUserID(ctx context.Context, id uint) ([]*entity.Transaction, error)
 	}
 )
 
-func NewTransactionUsecase(transactionRepo TransactionRepository, userRepo UserRepository, productRepo ProductRepository) TransactionUsecase {
+func NewTransactionUsecase(transactionRepo TransactionRepository, userRepo user.UserRepository, productRepo product.ProductRepository) TransactionUsecase {
 	return &transactionUsecase{
 		transactionRepo: transactionRepo,
 		userRepo:        userRepo,
-		// productRepo:     productRepo,
+		productRepo:     productRepo,
 	}
 }
 
-func (u *transactionUsecase) Buy(ctx context.Context, txn *entity.Transaction) error {
-	// Ensure the product exists
-	if _, err := u.productRepo.FindByID(ctx, txn.ProductID); err != nil {
-		return errors.New("product not found")
+func (u *transactionUsecase) CreateTransaction(ctx context.Context, txn *entity.Transaction) error {
+	product, err := u.productRepo.GetProductByID(ctx, txn.ProductID)
+	if err != nil {
+		return errors.New("Product not found")
 	}
-	// Ensure the buyer exists
-	if seller_id, err := u.userRepo.FindByID(ctx, txn.BuyerID); err != nil {
-		return errors.New("buyer not found")
+	if product.IsSold {
+		return errors.New("Product already sold")
 	}
-
-	// Ensure the seller exists
-	if _, err := u.userRepo.FindByID(ctx, txn.SellerID); err != nil {
-		return errors.New("seller not found")
+	txn.SellerID = product.UserID
+	txn.Amount = product.Price
+	if err := u.transactionRepo.CreateTransaction(ctx, txn); err != nil {
+		return err
 	}
-
-	return u.transactionRepo.CreateTransaction(ctx, txn)
+	product.IsSold = true
+	if err := u.productRepo.UpdateProduct(ctx, &product, uint(product.ID), uint(product.UserID)); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (u *transactionUsecase) FindById(ctx context.Context, id uint) (*entity.Transaction, error) {
-	return u.transactionRepo.FindById(ctx, id)
+func (u *transactionUsecase) GetTransactions(ctx context.Context) ([]*entity.Transaction, error) {
+	return u.transactionRepo.GetTransactions(ctx)
 }
 
-func (u *transactionUsecase) ListAll(ctx context.Context) ([]*entity.Transaction, error) {
-	return u.transactionRepo.ListAll(ctx)
+func (u *transactionUsecase) GetTransactionByID(ctx context.Context, id uint) (*entity.Transaction, error) {
+	transaction, err := u.transactionRepo.FindByTransactionID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return transaction, nil
 }
 
-func (u *transactionUsecase) ListAllByUserId(ctx context.Context, id uint) ([]*entity.Transaction, error) {
-	return u.transactionRepo.ListAllByUserId(ctx, id)
+func (u *transactionUsecase) GetTransactionsByUserID(ctx context.Context, id uint) ([]*entity.Transaction, error) {
+	transactions, err := u.transactionRepo.FindByUserID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if len(transactions) == 0 {
+		return nil, errors.New("No transactions found")
+	}
+	return transactions, nil
 }
