@@ -32,9 +32,11 @@ func (s *userService) Register(ctx *fiber.Ctx) error {
 	var req dto.RegisterRequest
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
-			Error: err.Error(),
+			Error:   err.Error(),
+			Success: false,
 		})
 	}
+	role := entity.RoleType(req.Role)
 	user := entity.User{
 		Name:           req.Name,
 		Surname:        req.Surname,
@@ -42,7 +44,7 @@ func (s *userService) Register(ctx *fiber.Ctx) error {
 		Password:       req.Password, // pass plain pwd to use case
 		PhoneNumber:    req.PhoneNumber,
 		ProfileURL:     req.ProfileURL,
-		Role:           entity.Customer,
+		Role:           role,
 		Address:        req.Address,
 		Verified:       false,
 		FoundationName: req.FoundationName,

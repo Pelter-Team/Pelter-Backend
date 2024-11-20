@@ -1,13 +1,13 @@
 package entity
 
 // Custom Enum Type
-type roleType string
+type RoleType string
 
 const (
-	Customer   roleType = "customer"
-	Admin      roleType = "admin"
-	Foundation roleType = "foundation"
-	Seller     roleType = "seller"
+	Customer   RoleType = "customer"
+	Admin      RoleType = "admin"
+	Foundation RoleType = "foundation"
+	Seller     RoleType = "seller"
 )
 
 type User struct {
@@ -18,7 +18,7 @@ type User struct {
 	Password       string
 	PhoneNumber    *string  `gorm:"default:null"`
 	ProfileURL     *string  `gorm:"default:null"`
-	Role           roleType `gorm:"type:role_type;default:'customer'"`
+	Role           RoleType `gorm:"type:role_type;default:'customer'"`
 	Address        *string  `gorm:"default:null"`
 	Verified       bool     `gorm:"default:false"`
 	FoundationName *string  `gorm:"default:null"`
