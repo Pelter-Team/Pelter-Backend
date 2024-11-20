@@ -29,9 +29,7 @@ Pelter-Backend is the backend service for the Pelter application. It provides AP
 
 1. Start the development server:
    ```sh
-   docker build .
    docker compose up
-   make run
    ```
 2. Access the API at `http://localhost:8080`
 
