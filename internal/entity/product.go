@@ -26,6 +26,7 @@ func (pr *Product) ConvertToProductResponse() dto.ProductResponse {
 	return dto.ProductResponse{
 		ID:             pr.ID,
 		Name:           pr.Name,
+		UserID:         pr.UserID,
 		IsSold:         pr.IsSold,
 		Category:       pr.Category,
 		Subcategory:    pr.Subcategory,

@@ -15,7 +15,7 @@ services:
       - .:/app
 
   db:
-    image: postgres:13
+    image: postgres:latest
     container_name: go_clean_db
     environment:
       PGUSER: ${DB_USER}
