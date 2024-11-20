@@ -3,7 +3,6 @@ package product
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"gorm.io/gorm"
 
@@ -90,13 +89,12 @@ func (r *productRepository) GetProductByID(pctx context.Context, productId uint)
 }
 
 func (r *productRepository) UpdateProduct(pctx context.Context, product *entity.Product, productId uint, userId uint) error {
-	isOwner, err := r.IsOwner(pctx, r.Db, userId, productId)
+	isOwner, err := r.IsOwner(pctx, r.Db, productId, userId)
 	if err != nil {
 		return err
 	}
 
 	if !isOwner {
-		fmt.Println("isOwner:", isOwner)
 		return errors.New("unauthorized: user does not have permission to update this product")
 	}
 
