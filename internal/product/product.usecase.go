@@ -15,7 +15,9 @@ type (
 		GetProduct(pctx context.Context) ([]dto.ProductResponse, error)
 		GetProductByID(pctx context.Context, productId uint) (dto.ProductResponse, error)
 		UpdateProduct(pctx context.Context, product *entity.Product, productId uint, userId uint) error
-		DeleteProduct(pctx context.Context, userId uint, productId uint) error
+		DeleteProduct(pctx context.Context, productId uint, userId uint) error
+		UpdateProductAdmin(pctx context.Context, product *entity.Product, productId uint, userId uint) error
+		DeleteProductAdmin(pctx context.Context, productId uint, userId uint) error
 	}
 )
 
@@ -65,8 +67,24 @@ func (u *productUsecase) UpdateProduct(pctx context.Context, product *entity.Pro
 	return nil
 }
 
-func (u *productUsecase) DeleteProduct(pctx context.Context, userId uint, productId uint) error {
-	err := u.productRepo.DeleteProduct(pctx, userId, productId)
+func (u *productUsecase) DeleteProduct(pctx context.Context, productId uint, userId uint) error {
+	err := u.productRepo.DeleteProduct(pctx, productId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *productUsecase) UpdateProductAdmin(pctx context.Context, product *entity.Product, productId uint, userId uint) error {
+	err := u.productRepo.UpdateProductAdmin(pctx, product, productId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *productUsecase) DeleteProductAdmin(pctx context.Context, productId uint, userId uint) error {
+	err := u.productRepo.DeleteProductAdmin(pctx, productId, userId)
 	if err != nil {
 		return err
 	}

@@ -4,7 +4,7 @@ import (
 	"Pelter_backend/internal/dto"
 	"Pelter_backend/internal/entity"
 	"Pelter_backend/internal/pkg/jwt"
-	"strconv"
+	"Pelter_backend/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -19,6 +19,8 @@ type (
 		GetProductByID(ctx *fiber.Ctx) error
 		UpdateProduct(ctx *fiber.Ctx) error
 		DeleteProduct(ctx *fiber.Ctx) error
+		UpdateProductAdmin(ctx *fiber.Ctx) error
+		DeleteProductAdmin(ctx *fiber.Ctx) error
 	}
 )
 
@@ -87,8 +89,7 @@ func (s *productService) GetProduct(ctx *fiber.Ctx) error {
 }
 
 func (s *productService) GetProductByID(ctx *fiber.Ctx) error {
-	idParam := ctx.Params("id")
-	id, err := strconv.ParseUint(idParam, 10, 64)
+	id, err := utils.ParseIDParam(ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
 			Error:   "Invalid ID",
@@ -96,7 +97,7 @@ func (s *productService) GetProductByID(ctx *fiber.Ctx) error {
 		})
 	}
 
-	product, err := s.productUsecase.GetProductByID(ctx.UserContext(), uint(id))
+	product, err := s.productUsecase.GetProductByID(ctx.UserContext(), id)
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error:   err.Error(),
@@ -111,8 +112,7 @@ func (s *productService) GetProductByID(ctx *fiber.Ctx) error {
 }
 
 func (s *productService) UpdateProduct(ctx *fiber.Ctx) error {
-	idParam := ctx.Params("id")
-	id, err := strconv.ParseUint(idParam, 10, 64)
+	id, err := utils.ParseIDParam(ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
 			Error:   "Invalid ID",
@@ -148,7 +148,7 @@ func (s *productService) UpdateProduct(ctx *fiber.Ctx) error {
 		VaccineBookURL: req.VaccineBookURL,
 	}
 
-	err = s.productUsecase.UpdateProduct(ctx.UserContext(), &updateProduct, uint(id), userId)
+	err = s.productUsecase.UpdateProduct(ctx.UserContext(), &updateProduct, id, userId)
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error:   err.Error(),
@@ -157,7 +157,7 @@ func (s *productService) UpdateProduct(ctx *fiber.Ctx) error {
 	}
 
 	// Get updated product and response
-	product, err := s.productUsecase.GetProductByID(ctx.UserContext(), uint(id))
+	product, err := s.productUsecase.GetProductByID(ctx.UserContext(), id)
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error:   err.Error(),
@@ -172,8 +172,7 @@ func (s *productService) UpdateProduct(ctx *fiber.Ctx) error {
 }
 
 func (s *productService) DeleteProduct(ctx *fiber.Ctx) error {
-	idParam := ctx.Params("id")
-	id, err := strconv.ParseUint(idParam, 10, 64)
+	id, err := utils.ParseIDParam(ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
 			Error:   "Invalid ID",
@@ -189,7 +188,97 @@ func (s *productService) DeleteProduct(ctx *fiber.Ctx) error {
 		})
 	}
 
-	err = s.productUsecase.DeleteProduct(ctx.UserContext(), userId, uint(id))
+	err = s.productUsecase.DeleteProduct(ctx.UserContext(), id, userId)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   err.Error(),
+			Success: false,
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  "deleted product",
+		Success: true,
+	})
+}
+
+func (s *productService) UpdateProductAdmin(ctx *fiber.Ctx) error {
+	id, err := utils.ParseIDParam(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error:   "Invalid ID",
+			Success: false,
+		})
+	}
+
+	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   "Cannot get UserID from access_token context: " + err.Error(),
+			Success: false,
+		})
+	}
+
+	var req dto.ProductUpdateRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error: err.Error(),
+		})
+	}
+
+	updateProduct := entity.Product{
+		Name:           req.Name,
+		IsSold:         req.IsSold,
+		Category:       req.Category,
+		Subcategory:    req.Subcategory,
+		Description:    req.Description,
+		IsVerified:     req.IsVerified,
+		Price:          req.Price,
+		ImageURL:       req.ImageURL,
+		VaccineBookURL: req.VaccineBookURL,
+	}
+
+	err = s.productUsecase.UpdateProductAdmin(ctx.UserContext(), &updateProduct, id, userId)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   err.Error(),
+			Success: false,
+		})
+	}
+
+	// Get updated product and response
+	product, err := s.productUsecase.GetProductByID(ctx.UserContext(), id)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   err.Error(),
+			Success: false,
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  product,
+		Success: true,
+	})
+}
+
+func (s *productService) DeleteProductAdmin(ctx *fiber.Ctx) error {
+	id, err := utils.ParseIDParam(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error:   "Invalid ID",
+			Success: false,
+		})
+	}
+
+	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   "Cannot get UserID from access_token context: " + err.Error(),
+			Success: false,
+		})
+	}
+
+	err = s.productUsecase.DeleteProductAdmin(ctx.UserContext(), id, userId)
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error:   err.Error(),
