@@ -17,10 +17,11 @@ type (
 		Create(pctx context.Context, user *entity.User) error
 		FindByEmail(pctx context.Context, email string) (entity.User, error)
 		CountUserByEmail(pctx context.Context, email string) (int64, error)
+		FindByID(pctx context.Context, id uint) (*entity.User, error)
 	}
 )
 
-func (r *userRepository) userTable(pctx context.Context) (*gorm.DB) {
+func (r *userRepository) userTable(pctx context.Context) *gorm.DB {
 	return r.Db.Table("users").WithContext(pctx)
 }
 
