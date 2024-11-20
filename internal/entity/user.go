@@ -7,7 +7,6 @@ const (
 	Customer   RoleType = "customer"
 	Admin      RoleType = "admin"
 	Foundation RoleType = "foundation"
-	Seller     RoleType = "seller"
 )
 
 type User struct {
