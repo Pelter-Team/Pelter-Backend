@@ -98,7 +98,10 @@ func (s *transactionService) GetTransactions(ctx *fiber.Ctx) error {
 		})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(txns)
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  txns,
+		Success: true,
+	})
 }
 
 func (s *transactionService) GetTransactionByID(ctx *fiber.Ctx) error {
@@ -120,7 +123,17 @@ func (s *transactionService) GetTransactionByID(ctx *fiber.Ctx) error {
 		})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(txn)
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result: dto.TransactionResponse{
+			ID:        txn.ID,
+			ProductID: txn.ProductID,
+			BuyerID:   txn.BuyerID,
+			SellerID:  txn.SellerID,
+			Amount:    uint(txn.Amount),
+			CreatedAt: txn.CreatedAt.String(),
+		},
+		Success: true,
+	})
 }
 
 func (s *transactionService) GetTransactionsByUserID(ctx *fiber.Ctx) error {
@@ -141,5 +154,8 @@ func (s *transactionService) GetTransactionsByUserID(ctx *fiber.Ctx) error {
 		})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(txns)
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  txns,
+		Success: true,
+	})
 }
