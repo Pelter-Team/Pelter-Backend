@@ -41,4 +41,4 @@ Create a `.env` file in the root directory and add the following environment var
 
 ## API Documentation
 
-For detailed API documentation, refer to the [API Docs](https://bloombeat.postman.co/workspace/4feffffa-71d8-4c23-8bc2-b6788f546642/overview).
+For detailed API documentation, refer to the [API Docs](https://documenter.getpostman.com/view/39871792/2sAYBSiYV7).
