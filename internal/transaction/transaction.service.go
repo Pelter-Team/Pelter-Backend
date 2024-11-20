@@ -38,7 +38,7 @@ func (s *transactionService) CreateTransaction(ctx *fiber.Ctx) error {
 	}
 	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
 	if err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+		return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
 			Error:   "Cannot get UserID from access_token context: " + err.Error(),
 			Success: false,
 		})
@@ -51,17 +51,20 @@ func (s *transactionService) CreateTransaction(ctx *fiber.Ctx) error {
 	if err != nil {
 		switch err.Error() {
 		case "Product already sold":
-			return ctx.Status(fiber.StatusConflict).JSON(dto.HttpResponse{
+			return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+				Result:  dto.TransactionResponse{},
 				Error:   err.Error(),
 				Success: false,
 			})
 		case "You cannot buy your own product":
-			return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+				Result:  dto.TransactionResponse{},
 				Error:   err.Error(),
 				Success: false,
 			})
 		case "Product not found":
-			return ctx.Status(fiber.StatusNotFound).JSON(dto.HttpResponse{
+			return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+				Result:  dto.TransactionResponse{},
 				Error:   err.Error(),
 				Success: false,
 			})
@@ -89,7 +92,9 @@ func (s *transactionService) GetTransactions(ctx *fiber.Ctx) error {
 	txns, err := s.transactionUsecase.GetTransactions(ctx.UserContext())
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
-			Error: err.Error(),
+			Result:  dto.TransactionResponse{},
+			Error:   err.Error(),
+			Success: false,
 		})
 	}
 
@@ -108,8 +113,10 @@ func (s *transactionService) GetTransactionByID(ctx *fiber.Ctx) error {
 
 	txn, err := s.transactionUsecase.GetTransactionByID(ctx.UserContext(), uint(id))
 	if err != nil {
-		return ctx.Status(fiber.StatusNotFound).JSON(dto.HttpResponse{
-			Error: err.Error(),
+		return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+			Result:  dto.TransactionResponse{},
+			Error:   err.Error(),
+			Success: false,
 		})
 	}
 
@@ -127,8 +134,10 @@ func (s *transactionService) GetTransactionsByUserID(ctx *fiber.Ctx) error {
 	}
 	txns, err := s.transactionUsecase.GetTransactionsByUserID(ctx.UserContext(), uint(id))
 	if err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
-			Error: err.Error(),
+		return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+			Result:  dto.TransactionResponse{},
+			Error:   err.Error(),
+			Success: false,
 		})
 	}
 
