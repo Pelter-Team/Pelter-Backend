@@ -7,6 +7,7 @@ import (
 	"Pelter_backend/internal/server"
 	"context"
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -24,12 +25,15 @@ func main() {
 
 	gormDb, err := gorm.DbConn(&cfg.Database) // gorm db init
 	if err != nil {
-		panic("can't connect to db")
+		log.Panicf("Failed to connect to database: %v", err)
 	}
 
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
 		AllowOrigins:     cfg.App.Origin,
+		AllowHeaders:     "Origin,Content-Type,Accept",
+		AllowMethods:     "GET,POST,PUT,DELETE,PATCH",
+		ExposeHeaders:    "Set-Cookie",
 	}))
 
 	go func() { // start server
