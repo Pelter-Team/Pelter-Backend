@@ -19,6 +19,7 @@ type (
 	UserUsecase interface {
 		Register(pctx context.Context, user *entity.User) (dto.LoginResponse, string, error)
 		Login(pctx context.Context, email string, password string) (dto.LoginResponse, string, error)
+		GetUsers(ctx context.Context) ([]*dto.UserResponse, error)
 	}
 )
 
@@ -82,4 +83,24 @@ func (u *userUsecase) Login(pctx context.Context, email string, password string)
 		ProfileURL: user.ProfileURL,
 		Role:       string(user.Role),
 	}, token, nil
+}
+func (u *userUsecase) GetUsers(ctx context.Context) ([]*dto.UserResponse, error) {
+	_users, err := u.userRepo.GetUsers(ctx)
+	if err != nil {
+		return make([]*dto.UserResponse, 0), err
+	}
+
+	users := make([]*dto.UserResponse, len(_users))
+	for i, user := range _users {
+		users[i] = &dto.UserResponse{
+			CreatedAt: user.CreatedAt,
+			Address:   user.Address,
+			UserID:    user.ID,
+			Username:  user.Name,
+			Phone:     user.PhoneNumber,
+		}
+	}
+
+	return users, nil
+
 }

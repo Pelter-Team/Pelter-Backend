@@ -1,5 +1,7 @@
 package entity
 
+import "time"
+
 // Custom Enum Type
 type RoleType string
 
@@ -21,6 +23,8 @@ type User struct {
 	Address        *string  `gorm:"default:null"`
 	Verified       bool     `gorm:"default:false"`
 	FoundationName *string  `gorm:"default:null"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 	ProductID      []Product
 	Transactions   []Transaction `gorm:"foreignKey:BuyerID"`
 	Sales          []Transaction `gorm:"foreignKey:SellerID"`

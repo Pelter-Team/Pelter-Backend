@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type RegisterRequest struct {
 	Name           string  `json:"name" validate:"required"`
 	Surname        string  `json:"surname" validate:"required"`
@@ -25,4 +27,12 @@ type LoginResponse struct {
 	Email      string  `json:"email"`
 	ProfileURL *string `json:"profileUrl"`
 	Role       string  `json:"role"`
+}
+
+type UserResponse struct {
+	CreatedAt time.Time `json:"created_at"`
+	Address   *string   `json:"address"`
+	UserID    uint      `json:"user_id"`
+	Username  string    `json:"username"`
+	Phone     *string   `json:"phone"`
 }

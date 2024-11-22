@@ -19,6 +19,7 @@ type (
 		Register(ctx *fiber.Ctx) error
 		Login(ctx *fiber.Ctx) error
 		Logout(ctx *fiber.Ctx) error
+		GetUsers(ctx *fiber.Ctx) error
 	}
 )
 
@@ -107,6 +108,22 @@ func (s *userService) Logout(ctx *fiber.Ctx) error {
 	ctx.ClearCookie("access_token")
 	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
 		Result:  "Logged out successfully",
+		Success: true,
+	})
+}
+
+func (s *userService) GetUsers(ctx *fiber.Ctx) error {
+	users, err := s.userUsecase.GetUsers(ctx.UserContext())
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Result:  dto.UserResponse{},
+			Error:   err.Error(),
+			Success: false,
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  users,
 		Success: true,
 	})
 }

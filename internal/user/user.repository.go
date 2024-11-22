@@ -18,6 +18,7 @@ type (
 		FindByEmail(pctx context.Context, email string) (entity.User, error)
 		CountUserByEmail(pctx context.Context, email string) (int64, error)
 		FindByID(pctx context.Context, id uint) (*entity.User, error)
+		GetUsers(pctx context.Context) ([]*entity.User, error)
 	}
 )
 
@@ -57,4 +58,11 @@ func (r *userRepository) FindByID(pctx context.Context, id uint) (*entity.User, 
 		return nil, err
 	}
 	return &user, nil
+}
+func (r *userRepository) GetUsers(pctx context.Context) ([]*entity.User, error) {
+	var users []*entity.User
+	if err := r.userTable(pctx).Where("role != ?", entity.Admin).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
 }
