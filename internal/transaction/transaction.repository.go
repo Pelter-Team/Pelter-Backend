@@ -38,7 +38,7 @@ func (r *transactionRepository) CreateTransaction(pctx context.Context, txn *ent
 
 func (r *transactionRepository) GetTransactions(pctx context.Context) ([]*entity.Transaction, error) {
 	var txns []*entity.Transaction
-	if err := r.transactionTable(pctx).Find(&txns).Error; err != nil {
+	if err := r.transactionTable(pctx).Preload("Product").Find(&txns).Error; err != nil {
 		return nil, err
 	}
 	return txns, nil

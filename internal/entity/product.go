@@ -8,6 +8,7 @@ import (
 type Product struct {
 	ID             uint `gorm:"primary_key"`
 	UserID         uint
+	User           User `gorm:"foreignKey:UserID"`
 	Review         []Review
 	Name           string
 	IsSold         bool
@@ -26,6 +27,7 @@ func (pr *Product) ConvertToProductResponse() dto.ProductResponse {
 	return dto.ProductResponse{
 		ID:             pr.ID,
 		Name:           pr.Name,
+		Owner:          pr.User.Name,
 		UserID:         pr.UserID,
 		IsSold:         pr.IsSold,
 		Category:       pr.Category,

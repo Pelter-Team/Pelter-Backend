@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
@@ -74,9 +75,17 @@ func (r *productRepository) InsertProduct(pctx context.Context, product *entity.
 
 func (r *productRepository) GetProduct(pctx context.Context) ([]entity.Product, error) {
 	var products []entity.Product
-	if err := r.productTable(pctx).Find(&products).Error; err != nil {
-		return []entity.Product{}, err
+
+	result := r.productTable(pctx).
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id, name")
+		}).
+		Find(&products)
+
+	if result.Error != nil {
+		return []entity.Product{}, fmt.Errorf("failed to get products: %w", result.Error)
 	}
+
 	return products, nil
 }
 

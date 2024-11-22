@@ -29,6 +29,7 @@ type ProductUpdateRequest struct {
 type ProductResponse struct {
 	ID             uint      `json:"id"`
 	UserID         uint      `json:"user_id"`
+	Owner          string    `json:"owner"`
 	TransactionID  uint      `json:"transaction_id"`
 	Review         []uint    `json:"review_id"`
 	Name           string    `json:"name" validate:"required"`

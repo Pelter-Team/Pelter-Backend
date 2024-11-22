@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"Pelter_backend/internal/dto"
 	"Pelter_backend/internal/entity"
 	"Pelter_backend/internal/product"
 	"Pelter_backend/internal/user"
@@ -17,7 +18,7 @@ type (
 
 	TransactionUsecase interface {
 		CreateTransaction(ctx context.Context, txn *entity.Transaction) (entity.Transaction, error)
-		GetTransactions(ctx context.Context) ([]*entity.Transaction, error)
+		GetTransactions(ctx context.Context) ([]*dto.TransactionWithProductResponse, error)
 		GetTransactionByID(ctx context.Context, id uint) (*entity.Transaction, error)
 		GetTransactionsByUserID(ctx context.Context, id uint) ([]*entity.Transaction, error)
 	}
@@ -54,8 +55,26 @@ func (u *transactionUsecase) CreateTransaction(ctx context.Context, txn *entity.
 	return *txn, nil
 }
 
-func (u *transactionUsecase) GetTransactions(ctx context.Context) ([]*entity.Transaction, error) {
-	return u.transactionRepo.GetTransactions(ctx)
+func (u *transactionUsecase) GetTransactions(ctx context.Context) ([]*dto.TransactionWithProductResponse, error) {
+	_transactions, err := u.transactionRepo.GetTransactions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	transactions := make([]*dto.TransactionWithProductResponse, 0, len(_transactions))
+	for _, txn := range _transactions {
+		transactions = append(transactions, &dto.TransactionWithProductResponse{
+			ID:         txn.ID,
+			ProductID:  txn.ProductID,
+			BuyerID:    txn.BuyerID,
+			SellerID:   txn.SellerID,
+			Amount:     uint(txn.Amount),
+			CreatedAt:  txn.CreatedAt.String(),
+			Price:      txn.Product.Price,
+			IsVerified: txn.Product.IsVerified,
+			IsSold:     txn.Product.IsSold,
+		})
+	}
+	return transactions, nil
 }
 
 func (u *transactionUsecase) GetTransactionByID(ctx context.Context, id uint) (*entity.Transaction, error) {
