@@ -1,6 +1,8 @@
 package dto
 
-import "time"
+import (
+	"time"
+)
 
 type RegisterRequest struct {
 	Name           string  `json:"name" validate:"required"`
@@ -35,4 +37,5 @@ type UserResponse struct {
 	UserID    uint      `json:"user_id"`
 	Username  string    `json:"username"`
 	Phone     *string   `json:"phone"`
+	Role      string    `json:"role"`
 }

@@ -98,6 +98,7 @@ func (u *userUsecase) GetUsers(ctx context.Context) ([]*dto.UserResponse, error)
 			UserID:    user.ID,
 			Username:  user.Name,
 			Phone:     user.PhoneNumber,
+			Role:      user.Role.String(),
 		}
 	}
 

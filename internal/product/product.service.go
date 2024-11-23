@@ -21,6 +21,7 @@ type (
 		DeleteProduct(ctx *fiber.Ctx) error
 		UpdateProductAdmin(ctx *fiber.Ctx) error
 		DeleteProductAdmin(ctx *fiber.Ctx) error
+		UpdateProductVerificationStatus(ctx *fiber.Ctx) error
 	}
 )
 
@@ -255,6 +256,44 @@ func (s *productService) UpdateProductAdmin(ctx *fiber.Ctx) error {
 		})
 	}
 
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  product,
+		Success: true,
+	})
+}
+
+func (s *productService) UpdateProductVerificationStatus(ctx *fiber.Ctx) error {
+	productId, err := utils.ParseIDParam(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error:   "Invalid ID",
+			Success: false,
+		})
+	}
+
+	// userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
+	// if err != nil {
+	// 	return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+	// 		Error:   "Cannot get UserID from access_token context: " + err.Error(),
+	// 		Success: false,
+	// 	})
+	// }
+
+	var req dto.ProductUpdateVerificationStatus
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error: err.Error(),
+		})
+	}
+
+	err = s.productUsecase.UpdateVerificationStatus(ctx.UserContext(), productId, req.IsVerified)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   err.Error(),
+			Success: false,
+		})
+	}
+	product, err := s.productUsecase.GetProductByID(ctx.UserContext(), productId)
 	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
 		Result:  product,
 		Success: true,

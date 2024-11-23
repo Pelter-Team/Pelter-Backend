@@ -11,6 +11,10 @@ const (
 	Foundation RoleType = "foundation"
 )
 
+func (r RoleType) String() string {
+	return string(r)
+}
+
 type User struct {
 	ID             uint `gorm:"primary_key"`
 	Name           string

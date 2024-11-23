@@ -23,6 +23,8 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	group.Put(("/:id"), middleware.ValidateCookie, service.UpdateProduct)
 	group.Delete(("/:id"), middleware.ValidateCookie, service.DeleteProduct)
 
+	group.Patch("/verification/:id", service.UpdateProductVerificationStatus)
+
 	//below = admin only
 	adminOnlyGroup := group.Group("/admin")
 	adminOnlyGroup.Put("/:id", middleware.ValidateCookie, service.UpdateProductAdmin)

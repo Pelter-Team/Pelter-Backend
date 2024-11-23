@@ -26,6 +26,10 @@ type ProductUpdateRequest struct {
 	VaccineBookURL *string `json:"vaccine_book_url,omitempty"`
 }
 
+type ProductUpdateVerificationStatus struct {
+	IsVerified bool `json:"is_verified"`
+}
+
 type ProductResponse struct {
 	ID             uint      `json:"id"`
 	UserID         uint      `json:"user_id"`
@@ -40,7 +44,7 @@ type ProductResponse struct {
 	IsVerified     bool      `json:"is_verified" validate:"required"`
 	Price          float64   `json:"price" validate:"required"`
 	ImageURL       string    `json:"image_url" validate:"required,url"`
-	VaccineBookURL *string   `json:"vaccine_book_url,omitempty" validate:"omitempty,url"`
+	VaccineBookURL *string   `json:"vaccine_book_url" validate:"omitempty,url"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }

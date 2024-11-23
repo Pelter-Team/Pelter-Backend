@@ -18,6 +18,7 @@ type (
 		DeleteProduct(pctx context.Context, productId uint, userId uint) error
 		UpdateProductAdmin(pctx context.Context, product *entity.Product, productId uint, userId uint) error
 		DeleteProductAdmin(pctx context.Context, productId uint, userId uint) error
+		UpdateVerificationStatus(pctx context.Context, productId uint, isVerify bool) error
 	}
 )
 
@@ -77,6 +78,13 @@ func (u *productUsecase) DeleteProduct(pctx context.Context, productId uint, use
 
 func (u *productUsecase) UpdateProductAdmin(pctx context.Context, product *entity.Product, productId uint, userId uint) error {
 	err := u.productRepo.UpdateProductAdmin(pctx, product, productId, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (u *productUsecase) UpdateVerificationStatus(pctx context.Context, productId uint, isVerify bool) error {
+	err := u.productRepo.UpdateVerificationStatus(pctx, productId, isVerify)
 	if err != nil {
 		return err
 	}

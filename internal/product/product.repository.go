@@ -21,6 +21,7 @@ type (
 		UpdateProduct(pctx context.Context, product *entity.Product, productId uint, userId uint) error
 		DeleteProduct(pctx context.Context, productId uint, userId uint) error
 		UpdateProductAdmin(pctx context.Context, product *entity.Product, productId uint, userId uint) error
+		UpdateVerificationStatus(pctx context.Context, productId uint, isVerified bool) error
 		DeleteProductAdmin(pctx context.Context, productId uint, userId uint) error
 		IsAdmin(ctx context.Context, db *gorm.DB, userId uint) (bool, error)
 		IsOwner(ctx context.Context, db *gorm.DB, productId uint, userId uint) (bool, error)
@@ -148,6 +149,23 @@ func (r *productRepository) UpdateProductAdmin(pctx context.Context, product *en
 	return nil
 }
 
+func (r *productRepository) UpdateVerificationStatus(pctx context.Context, productId uint, isVerified bool) error {
+	// TODO: if have time implement isAdmin
+	result := r.productTable(pctx).
+		Model(&entity.Product{}).
+		Where("id = ?", productId).
+		Update("is_verified", isVerified)
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to update verification status: %w", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("product with id %d not found", productId)
+	}
+
+	return nil
+}
 func (r *productRepository) DeleteProductAdmin(pctx context.Context, productId uint, userId uint) error {
 	isAdmin, err := r.IsAdmin(pctx, r.Db, userId)
 	if err != nil {
