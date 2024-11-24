@@ -2,6 +2,7 @@ package user
 
 import (
 	"Pelter_backend/internal/dto"
+	"Pelter_backend/internal/pkg/jwt"
 	"errors"
 
 	"Pelter_backend/internal/entity"
@@ -20,6 +21,7 @@ type (
 		Login(ctx *fiber.Ctx) error
 		Logout(ctx *fiber.Ctx) error
 		GetUsers(ctx *fiber.Ctx) error
+		GetMe(ctx *fiber.Ctx) error
 	}
 )
 
@@ -126,4 +128,29 @@ func (s *userService) GetUsers(ctx *fiber.Ctx) error {
 		Result:  users,
 		Success: true,
 	})
+}
+
+func (s *userService) GetMe(ctx *fiber.Ctx) error {
+	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
+	if err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(dto.HttpResponse{
+			Error:   "Cannot get UserID from access_token context: " + err.Error(),
+			Success: false,
+		})
+	}
+
+	user, err := s.userUsecase.GetUserById(ctx.UserContext(), userId)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Result:  dto.UserResponse{},
+			Error:   err.Error(),
+			Success: false,
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  user,
+		Success: true,
+	})
+
 }

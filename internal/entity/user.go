@@ -22,7 +22,7 @@ type User struct {
 	Email          string `gorm:"unique"`
 	Password       string
 	PhoneNumber    *string  `gorm:"default:null"`
-	ProfileURL     *string  `gorm:"default:null"`
+	ProfileURL     *string  `gorm:"default:'https://www.w3schools.com/howto/img_avatar.png'"`
 	Role           RoleType `gorm:"type:role_type;default:'customer'"`
 	Address        *string  `gorm:"default:null"`
 	Verified       bool     `gorm:"default:false"`

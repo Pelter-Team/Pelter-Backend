@@ -20,6 +20,7 @@ type (
 		Register(pctx context.Context, user *entity.User) (dto.LoginResponse, string, error)
 		Login(pctx context.Context, email string, password string) (dto.LoginResponse, string, error)
 		GetUsers(ctx context.Context) ([]*dto.UserResponse, error)
+		GetUserById(pctx context.Context, userId uint) (*dto.MeResponse, error)
 	}
 )
 
@@ -103,5 +104,20 @@ func (u *userUsecase) GetUsers(ctx context.Context) ([]*dto.UserResponse, error)
 	}
 
 	return users, nil
+
+}
+
+func (u *userUsecase) GetUserById(pctx context.Context, userId uint) (*dto.MeResponse, error) {
+	user, err := u.userRepo.FindByID(pctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.MeResponse{
+		UserID:     user.ID,
+		Username:   user.Name,
+		Role:       user.Role.String(),
+		ProfileURL: user.ProfileURL,
+	}, nil
 
 }

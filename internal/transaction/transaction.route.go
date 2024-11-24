@@ -17,6 +17,7 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	service := NewTransactionService(usecase)
 
 	groups := app.Group("/transactions")
+
 	groups.Get("/", middleware.ValidateCookie, service.GetTransactions)
 	group := app.Group("/transaction")
 	group.Post("/buy/:id", middleware.ValidateCookie, service.CreateTransaction)

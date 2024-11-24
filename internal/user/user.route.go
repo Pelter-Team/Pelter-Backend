@@ -16,6 +16,7 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	route := app.Group("/auth")
 	route.Post("/register", middleware.ValidationMiddleware(&dto.RegisterRequest{}), service.Register)
 	route.Post("/login", middleware.ValidationMiddleware(&dto.LoginRequest{}), service.Login)
+	route.Get("/me", middleware.ValidateCookie, service.GetMe)
 	route.Get("/logout", service.Logout)
 	admin := app.Group("/admin")
 	admin.Get("/users", middleware.ValidateCookie, service.GetUsers)
