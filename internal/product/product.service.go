@@ -5,6 +5,7 @@ import (
 	"Pelter_backend/internal/entity"
 	"Pelter_backend/internal/pkg/jwt"
 	"Pelter_backend/internal/utils"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,6 +23,9 @@ type (
 		UpdateProductAdmin(ctx *fiber.Ctx) error
 		DeleteProductAdmin(ctx *fiber.Ctx) error
 		UpdateProductVerificationStatus(ctx *fiber.Ctx) error
+		GetProductByBuyerId(ctx *fiber.Ctx) error
+		GetProductByUserId(ctx *fiber.Ctx) error
+		UpdateProductIsSold(ctx *fiber.Ctx) error
 	}
 )
 
@@ -329,4 +333,91 @@ func (s *productService) DeleteProductAdmin(ctx *fiber.Ctx) error {
 		Result:  "deleted product",
 		Success: true,
 	})
+}
+
+func (s *productService) GetProductByBuyerId(ctx *fiber.Ctx) error {
+
+	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   "Cannot get UserID from access_token context: " + err.Error(),
+			Success: false,
+		})
+	}
+
+	transactions, err := s.productUsecase.GetProductByBuyerId(ctx.UserContext(), userId)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   err.Error(),
+			Success: false,
+		})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  transactions,
+		Success: true,
+	})
+
+}
+func (s *productService) GetProductByUserId(ctx *fiber.Ctx) error {
+
+	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   "Cannot get UserID from access_token context: " + err.Error(),
+			Success: false,
+		})
+	}
+
+	products, err := s.productUsecase.GetProductByUserId(ctx.UserContext(), userId)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   err.Error(),
+			Success: false,
+		})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  products,
+		Success: true,
+	})
+
+}
+
+func (s *productService) UpdateProductIsSold(ctx *fiber.Ctx) error {
+
+	userId, err := jwt.GetIDFromToken(ctx.Cookies("access_token"))
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   "Cannot get UserID from access_token context: " + err.Error(),
+			Success: false,
+		})
+	}
+	fmt.Println(userId)
+
+	productId, err := utils.ParseIDParam(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error:   "Invalid ID",
+			Success: false,
+		})
+	}
+
+	var req dto.UpdateProductIsSold
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error: err.Error(),
+		})
+	}
+
+	products, err := s.productUsecase.UpdateProductIsSold(ctx.UserContext(), productId, userId, req.IsSold)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   err.Error(),
+			Success: false,
+		})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  products,
+		Success: true,
+	})
+
 }

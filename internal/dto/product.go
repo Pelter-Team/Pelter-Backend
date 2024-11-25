@@ -34,7 +34,10 @@ type ProductResponse struct {
 	ID             uint      `json:"id"`
 	UserID         uint      `json:"user_id"`
 	Owner          string    `json:"owner"`
+	UserProfileUrl *string   `json:"user_profile_url"`
+	Role           string    `json:"role"`
 	TransactionID  uint      `json:"transaction_id"`
+	Phone          *string   `json:"phone"`
 	Review         []uint    `json:"review_id"`
 	Name           string    `json:"name" validate:"required"`
 	IsSold         bool      `json:"is_sold" validate:"required"`
@@ -47,4 +50,21 @@ type ProductResponse struct {
 	VaccineBookURL *string   `json:"vaccine_book_url" validate:"omitempty,url"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
+}
+
+type ProductWithUserResponse struct {
+	ID          uint      `json:"id"`
+	UserID      uint      `json:"user_id"`
+	Name        string    `json:"name" validate:"required"`
+	IsSold      bool      `json:"is_sold" validate:"required"`
+	IsVerified  bool      `json:"is_verified" validate:"required"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Description string    `json:"description" validate:"required"`
+	Category    string    `json:"category" validate:"required"`
+	Subcategory string    `json:"subcategory" validate:"required"`
+}
+
+type UpdateProductIsSold struct {
+	IsSold bool `json:"is_sold"`
 }

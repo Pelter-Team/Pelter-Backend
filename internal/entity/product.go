@@ -19,6 +19,7 @@ type Product struct {
 	Price          float64
 	ImageURL       string
 	VaccineBookURL *string
+	Phone          string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }
@@ -28,7 +29,10 @@ func (pr *Product) ConvertToProductResponse() dto.ProductResponse {
 		ID:             pr.ID,
 		Name:           pr.Name,
 		Owner:          pr.User.Name,
+		Role:           pr.User.Role.String(),
 		UserID:         pr.UserID,
+		Phone:          pr.User.PhoneNumber,
+		UserProfileUrl: pr.User.ProfileURL,
 		IsSold:         pr.IsSold,
 		Category:       pr.Category,
 		Subcategory:    pr.Subcategory,

@@ -10,5 +10,7 @@ type Transaction struct {
 	Amount    float64 // This might be redundant -> getting from Product entity (Price)
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Product   Product
+	Product   Product `gorm:"foreignKey:ProductID"`
+	Buyer     User    `gorm:"foreignKey:BuyerID"`
+	Seller    User    `gorm:"foreignKey:SellerID"`
 }

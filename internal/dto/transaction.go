@@ -8,6 +8,7 @@ type TransactionResponse struct {
 	Amount    uint   `json:"amount"`
 	CreatedAt string `json:"created_at"`
 }
+
 type TransactionWithProductResponse struct {
 	ID         uint    `json:"id"`
 	ProductID  uint    `json:"product_id"`
