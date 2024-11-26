@@ -29,6 +29,7 @@ type LoginResponse struct {
 	Email      string  `json:"email"`
 	ProfileURL *string `json:"profileUrl"`
 	Role       string  `json:"role"`
+	Phone      *string `json:"phone"`
 }
 
 type UserResponse struct {
@@ -45,4 +46,6 @@ type MeResponse struct {
 	Username   string  `json:"username"`
 	Role       string  `json:"role"`
 	ProfileURL *string `json:"profileUrl"`
+	Surname    string  `json:"surname"`
+	Phone      *string `json:"phone"`
 }

@@ -159,7 +159,7 @@ func (u *productUsecase) UpdateProductIsSold(pctx context.Context, productId, us
 		return dto.ProductResponse{}, err
 	}
 
-	product, err := u.productRepo.GetProductByID(pctx, userId)
+	product, err := u.productRepo.GetProductByID(pctx, productId)
 	if err != nil {
 		return dto.ProductResponse{}, err
 	}

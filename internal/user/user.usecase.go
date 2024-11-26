@@ -59,6 +59,7 @@ func (u *userUsecase) Register(pctx context.Context, user *entity.User) (dto.Log
 		Email:      user.Email,
 		ProfileURL: user.ProfileURL,
 		Role:       string(user.Role),
+		Phone:      user.PhoneNumber,
 	}, token, nil
 }
 
@@ -83,6 +84,7 @@ func (u *userUsecase) Login(pctx context.Context, email string, password string)
 		Email:      user.Email,
 		ProfileURL: user.ProfileURL,
 		Role:       string(user.Role),
+		Phone:      user.PhoneNumber,
 	}, token, nil
 }
 func (u *userUsecase) GetUsers(ctx context.Context) ([]*dto.UserResponse, error) {
@@ -118,6 +120,8 @@ func (u *userUsecase) GetUserById(pctx context.Context, userId uint) (*dto.MeRes
 		Username:   user.Name,
 		Role:       user.Role.String(),
 		ProfileURL: user.ProfileURL,
+		Surname:    user.Surname,
+		Phone:      user.PhoneNumber,
 	}, nil
 
 }
