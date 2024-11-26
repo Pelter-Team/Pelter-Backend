@@ -28,6 +28,7 @@ type (
 		GetProductByBuyerId(pctx context.Context, userId uint) ([]*entity.Transaction, error)
 		GetProductByUserId(pctx context.Context, userId uint) ([]entity.Product, error)
 		UpdateProductIsSoldById(pctx context.Context, productId, userId uint, is_sold bool) error
+		GetProductIn(pctx context.Context, productIds []uint) ([]entity.Product, error)
 	}
 )
 
@@ -81,6 +82,22 @@ func (r *productRepository) GetProduct(pctx context.Context) ([]entity.Product, 
 	var products []entity.Product
 
 	result := r.productTable(pctx).
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id, name, role")
+		}).
+		Find(&products)
+
+	if result.Error != nil {
+		return []entity.Product{}, fmt.Errorf("failed to get products: %w", result.Error)
+	}
+
+	return products, nil
+}
+func (r *productRepository) GetProductIn(pctx context.Context, productIds []uint) ([]entity.Product, error) {
+	var products []entity.Product
+
+	result := r.productTable(pctx).
+		Where("id IN ?", productIds).
 		Preload("User", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id, name, role")
 		}).

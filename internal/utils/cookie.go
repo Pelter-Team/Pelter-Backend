@@ -18,3 +18,14 @@ func SetCookie(ctx *fiber.Ctx, name, token string) {
 	ctx.Cookie(cookie)
 }
 
+func ClearCookie(ctx *fiber.Ctx, name string) {
+	cookie := new(fiber.Cookie)
+	cookie.Name = name
+	cookie.Value = ""
+	cookie.Secure = true
+	cookie.HTTPOnly = true
+	cookie.Expires = time.Now()
+	cookie.MaxAge = -1
+	cookie.Path = "/"
+	ctx.Cookie(cookie)
+}

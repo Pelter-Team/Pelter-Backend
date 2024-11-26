@@ -11,6 +11,4 @@ type Transaction struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Product   Product `gorm:"foreignKey:ProductID"`
-	Buyer     User    `gorm:"foreignKey:BuyerID"`
-	Seller    User    `gorm:"foreignKey:SellerID"`
 }

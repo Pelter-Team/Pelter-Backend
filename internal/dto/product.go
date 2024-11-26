@@ -68,3 +68,7 @@ type ProductWithUserResponse struct {
 type UpdateProductIsSold struct {
 	IsSold bool `json:"is_sold"`
 }
+
+type QueryProductsIn struct {
+	ProductsId []uint `json:"productIds" validate:"required"`
+}

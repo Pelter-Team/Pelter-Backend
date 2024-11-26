@@ -22,6 +22,7 @@ type (
 		GetProductByBuyerId(pctx context.Context, userId uint) ([]*entity.Transaction, error)
 		GetProductByUserId(pctx context.Context, userId uint) ([]*dto.ProductWithUserResponse, error)
 		UpdateProductIsSold(pctx context.Context, productId, userId uint, isSold bool) (dto.ProductResponse, error)
+		GetProductIn(pctx context.Context, productIds []uint) ([]dto.ProductResponse, error)
 	}
 )
 
@@ -44,6 +45,19 @@ func (u *productUsecase) InsertProduct(pctx context.Context, product *entity.Pro
 
 func (u *productUsecase) GetProduct(pctx context.Context) ([]dto.ProductResponse, error) {
 	products, err := u.productRepo.GetProduct(pctx)
+	if err != nil {
+		return []dto.ProductResponse{}, err
+	}
+
+	var productResponses []dto.ProductResponse
+	for _, product := range products {
+		productResponses = append(productResponses, product.ConvertToProductResponse())
+	}
+	return productResponses, nil
+}
+
+func (u *productUsecase) GetProductIn(pctx context.Context, productIds []uint) ([]dto.ProductResponse, error) {
+	products, err := u.productRepo.GetProductIn(pctx, productIds)
 	if err != nil {
 		return []dto.ProductResponse{}, err
 	}

@@ -19,6 +19,9 @@ func Route(app *fiber.App, gorm *gorm.DB) {
 	// groups.Get("/buyer", middleware.ValidateCookie, service.GetProductByBuyerId)
 	groups.Get("/user", middleware.ValidateCookie, service.GetProductByUserId)
 
+	// be post for now since need an array of productId
+	groups.Post("/favorite", service.GetProductIn)
+
 	groups.Get("/", service.GetProduct)
 	group := app.Group("/product")
 	group.Get(("/:id"), service.GetProductByID)

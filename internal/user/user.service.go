@@ -107,7 +107,7 @@ func (s *userService) Login(ctx *fiber.Ctx) error {
 }
 
 func (s *userService) Logout(ctx *fiber.Ctx) error {
-	ctx.ClearCookie("access_token")
+	utils.ClearCookie(ctx, "access_token")
 	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
 		Result:  "Logged out successfully",
 		Success: true,

@@ -51,19 +51,19 @@ func (s *transactionService) CreateTransaction(ctx *fiber.Ctx) error {
 	if err != nil {
 		switch err.Error() {
 		case "Product already sold":
-			return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+			return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
 				Result:  dto.TransactionResponse{},
 				Error:   err.Error(),
 				Success: false,
 			})
 		case "You cannot buy your own product":
-			return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+			return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
 				Result:  dto.TransactionResponse{},
 				Error:   err.Error(),
 				Success: false,
 			})
 		case "Product not found":
-			return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+			return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
 				Result:  dto.TransactionResponse{},
 				Error:   err.Error(),
 				Success: false,

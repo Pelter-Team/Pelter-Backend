@@ -5,7 +5,6 @@ import (
 	"Pelter_backend/internal/entity"
 	"Pelter_backend/internal/pkg/jwt"
 	"Pelter_backend/internal/utils"
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,6 +16,7 @@ type (
 	ProductService interface {
 		InsertProduct(ctx *fiber.Ctx) error
 		GetProduct(ctx *fiber.Ctx) error
+		GetProductIn(ctx *fiber.Ctx) error
 		GetProductByID(ctx *fiber.Ctx) error
 		UpdateProduct(ctx *fiber.Ctx) error
 		DeleteProduct(ctx *fiber.Ctx) error
@@ -391,7 +391,6 @@ func (s *productService) UpdateProductIsSold(ctx *fiber.Ctx) error {
 			Success: false,
 		})
 	}
-	fmt.Println(userId)
 
 	productId, err := utils.ParseIDParam(ctx)
 	if err != nil {
@@ -409,6 +408,29 @@ func (s *productService) UpdateProductIsSold(ctx *fiber.Ctx) error {
 	}
 
 	products, err := s.productUsecase.UpdateProductIsSold(ctx.UserContext(), productId, userId, req.IsSold)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
+			Error:   err.Error(),
+			Success: false,
+		})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(dto.HttpResponse{
+		Result:  products,
+		Success: true,
+	})
+
+}
+
+func (s *productService) GetProductIn(ctx *fiber.Ctx) error {
+
+	var req dto.QueryProductsIn
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.HttpResponse{
+			Error: err.Error(),
+		})
+	}
+
+	products, err := s.productUsecase.GetProductIn(ctx.UserContext(), req.ProductsId)
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(dto.HttpResponse{
 			Error:   err.Error(),
